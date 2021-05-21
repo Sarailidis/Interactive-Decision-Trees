@@ -1,0 +1,15 @@
+Geophysical Properties (space separated):
+
+K_sat_0 K_sat_1 gamma_us_0 gamma_us_1 theta_s_0 theta_s_1 theta_s_2 theta_r_0 theta_r_1 theta_r_2 alpha_0 alpha_1 alpha_2 c_0 c_1 n_0 n_1 n_2 psi_init phi_0 phi_1
+
+Slope Geometry (space separated):
+
+delta H H0 H1
+
+Design Storm (space separated):
+
+I D
+
+Init Hydrological Conditions (space separated):
+
+DWT
