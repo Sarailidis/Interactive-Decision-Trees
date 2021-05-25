@@ -1,0 +1,18 @@
+Corresponding SO Id	Uncertainty	Quantity	Id	nodes_classes	Node_Samples	Holdridge Life Zones
+23	Same	Increase	10	C1	68	6
+28	Same	Increase	14	C1	22	12
+17	Decrease	Decrease	19	C1	30	11
+24	Decrease	Decrease	11	C2	10	6
+27	Same	Increase	13	C2	88	12
+14	Decrease	Decrease	18	C2	48	11
+18	Decrease	Decrease	20	C2	62	11
+26	Decrease	Decrease	24	C2	8	2
+15	Same	Same	7	C3	27	5
+25	Decrease	Decrease	22	C3	36	4
+25	Decrease	Decrease	25	C3	14	2
+20	Same	Increase	26	C3	87	5
+21	Decrease	Decrease	28	C3	72	5
+22	Decrease (Switch class)	Increase	30	C3	3	10
+16	Same	Same	8	C4	122	15
+22	Same	Decrease	31	C4	9	10
+12	Same	Same	32	C4	44	15

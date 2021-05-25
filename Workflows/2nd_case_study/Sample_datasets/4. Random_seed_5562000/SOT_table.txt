@@ -1,0 +1,16 @@
+Id	nodes_classes	Node_Samples	Holdridge Life Zones
+17	C1	33	17
+23	C1	56	6
+28	C1	18	12
+14	C2	52	17
+18	C2	65	17
+24	C2	20	12
+26	C2	11	17
+27	C2	77	12
+15	C3	27	5
+20	C3	76	5
+21	C3	73	9
+25	C3	65	17
+12	C4	44	15
+16	C4	122	15
+22	C4	11	10
