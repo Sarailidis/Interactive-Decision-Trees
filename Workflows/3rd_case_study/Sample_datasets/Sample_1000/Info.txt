@@ -1,0 +1,30 @@
+Stat Opt Tree:
+DecisionTreeClassifier(ccp_alpha=0.0, class_weight=None, criterion='gini',
+                       max_depth=None, max_features=None, max_leaf_nodes=15,
+                       min_impurity_decrease=0.0, min_impurity_split=None,
+                       min_samples_leaf=1, min_samples_split=2,
+                       min_weight_fraction_leaf=0.0, presort='deprecated',
+                       random_state=None, splitter='best')
+
+
+Accuracy - train = 0.894
+Accuracy - test  = 0.584
+
+
+iDT:
+Accuracy - train = 0.743
+Accuracy - test  = 0.652
+
+Derivation of iDT:
+Changes to features and/or thresholds to split:
+Node 1  (of the SOT): From Pm<=178.95 to Pm<=300 (Max_leaf_nodes_left = 2, Max_leaf_nodes_right = 7)
+Node 5  (of the last modified tree): From LAI_max<=7.652 to Vr<=200 (Max_leaf_nodes_left = 4, Max_leaf_nodes_right = 4)
+Node 13 (of the last modified tree): From AI<=0.733 to Pm<=500 (Max_leaf_nodes_left = 2, Max_leaf_nodes_right = 2)
+Node 20 (of the last modified tree): From LAI_max<=7.652 to Ip<=7.0 (Max_leaf_nodes_left = 2, Max_leaf_nodes_right = 2)
+
+Manual pruning:
+Node 21 (of the last modified tree)
+
+Changing leaf nodes classes to C2:
+Node 4  (of the last pruned tree)
+Node 21 (of the last pruned tree)
