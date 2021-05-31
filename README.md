@@ -17,7 +17,7 @@ The python modules and Jupyter Lab notebooks require the following packages to b
 |numpy:       |  '1.18.1' |
 |matplotlib:  |   '3.2.1' |
 
-The notebooks make use of the plotly and ipywidgets libraries for the interactive plots. To run the notebooks in Jupyter Lab then:
+The InteractiveDecisionTrees User interface and the rest of the notebooks run only on Jupyter lab. The notebooks make use of the plotly and ipywidgets libraries for the interactive plots. To run the notebooks in Jupyter Lab:
 
 1) Install the jupyterlab and ipywidgets packages:
 
