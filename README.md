@@ -11,7 +11,7 @@ The ptyhon modules and Jupyter Lab notebooks require the following packages to b
 |sklearn:     |  '0.22.1' |
 |plotly :     |   '4.7.1' | 
 |ipywidgets:  |   '7.5.1' |  
-|igraph:      |   '0.8.2' |
+|python-igraph:      |   '0.8.2' |
 |chart-studio:|   '1.1.0' |
 |pandas:      |   '1.2.4' |
 |numpy:       |  '1.18.1' |
