@@ -33,7 +33,6 @@ import igraph
 
 #import cairo
 from igraph import Graph, EdgeSeq
-import iCART
 
 import warnings
 
