@@ -21,19 +21,19 @@ The notebooks make use of the plotly and ipywidgets libraries for the interactiv
 
 1) install the jupyterlab and ipywidgets packages using pip:
 
-  $ pip install jupyterlab "ipywidgets>=7.5"
+    - $ pip install jupyterlab "ipywidgets>=7.5"
 
-  or conda:
+    or conda:
 
-  $ conda install jupyterlab "ipywidgets>=7.5"
+    - $ conda install jupyterlab "ipywidgets>=7.5"
 
 2) Then run the following commands to install the required JupyterLab extensions (note that this will require node to be installed):
 
-  JupyterLab renderer support:
-  jupyter labextension install jupyterlab-plotly@4.14.3
+    - JupyterLab renderer support:
+      jupyter labextension install jupyterlab-plotly@4.14.3
 
-  Jupyter widgets extension:
-  jupyter labextension install @jupyter-widgets/jupyterlab-manager plotlywidget@4.14.3
+    - Jupyter widgets extension:
+      jupyter labextension install @jupyter-widgets/jupyterlab-manager plotlywidget@4.14.3
 
 
 
