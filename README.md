@@ -4,7 +4,7 @@ This repository contains modules in Python and Jupyter Lab Notebooks for Interac
 
 # Requirements
 
-The ptyhon modules and Jupyter Lab notebooks require the following packages to be installed:
+The python modules and Jupyter Lab notebooks require the following packages to be installed in the following versions:
 
 |Package      |   Version |
 |:-----------:|:---------:|    
@@ -17,7 +17,7 @@ The ptyhon modules and Jupyter Lab notebooks require the following packages to b
 |numpy:       |  '1.18.1' |
 |matplotlib:  |   '3.2.1' |
 
-
+The plotly library is used for the interactive plots. If someone wants to work the notebooks in Jupyter Lab then 
 # Contact
 If you have any questions or feedback, or if you spotted an error or bug, please email Georgios Sarailidis (g.sarailidis@bristol.ac.uk)
 
