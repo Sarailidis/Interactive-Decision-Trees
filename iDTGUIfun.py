@@ -291,6 +291,7 @@ class InteractiveDecisionTreesGUI():
         Import_files_out=widgets.Output()
         #Create the function to be executed and which enables the loading of the dataset file with the button click
         def load_file(ldf, train_test_splitting=self.Train_test_splitting.value):
+            Import_files_out.clear_output()
             with Import_files_out:
                 dataset_dict=import_file(filename=filename_widget.value, sample_size=Sample_size_widget.value, random_sampling=Random_sampling_widget.value, 
                                          header=None if Header_widget.value==-1 else Header_widget.value, index_col=None if Index_col_widget.value==-1 else Index_col_widget.value,
@@ -334,6 +335,8 @@ class InteractiveDecisionTreesGUI():
                     self.Data_dict['y'].drop(indexes, inplace=True)
                     #Then from the input dataset
                     self.Data_dict['x'].dropna(inplace=True)
+                
+                print('Dataset loaded!')
 
         #Assign the above function to the button click
         Import_files_button.on_click(load_file)
@@ -348,8 +351,15 @@ class InteractiveDecisionTreesGUI():
         Train_test_box=widgets.HBox([self.Train_test_splitting, test_size_widget])
         #File Options Box
         File_options_box=widgets.VBox([Random_sampling_box, Header_column_sep_box, Train_test_box, Random_state_widget])
+        #All import files options in a box
+        Import_files_all_options_box=widgets.VBox([Filename_box, File_options_box])
+        #Import File button output message Box
+        Import_files_out_box = widgets.HBox([Import_files_button, Import_files_out])
         #Import file box
-        self.Import_file_box=widgets.VBox([Filename_box, File_options_box, Import_files_button, Import_files_out])
+        self.Import_file_box=widgets.VBox([Import_files_all_options_box, Import_files_out_box])
+        
+#         self.Import_file_box=widgets.VBox([Filename_box, File_options_box, Import_files_button, Import_files_out_box]) # Import_files_button, Import_files_out
+        
         
     #Create the appropriate widgets for storing the classes_labels and their corresponding colors
     def DefineClassesGUI(self):
@@ -368,9 +378,11 @@ class InteractiveDecisionTreesGUI():
         add_label_button=widgets.Button(description='Add Class Label', layout=Layout(width='35%'))
         add_label_out=widgets.Output()
         def add_label(addlbl):
+            add_label_out.clear_output()
             with add_label_out:
                 classes_labels.append(class_label_widget.value)
                 self.classes_dict['Classes Labels']=classes_labels
+                print('Class {} Added'.format(class_label_widget.value))
             return self.classes_dict
         #Assign the above function to the button click        
         add_label_button.on_click(add_label)
@@ -378,16 +390,26 @@ class InteractiveDecisionTreesGUI():
         assign_color_class_button=widgets.Button(description='Assign color to the Class', layout=Layout(width='35%'))
         ass_col_class_out=widgets.Output()
         def assign_color_class(asscolcl):
+            ass_col_class_out.clear_output()
             with ass_col_class_out:
                 classes_colors.append(pick_class_color_widget.value)
                 self.classes_dict['Classes Colors']=classes_colors
+                print('Color {} assigned to Class {}'.format(pick_class_color_widget.value,class_label_widget.value))
             return self.classes_dict
         #Assign the above function to the button click
         assign_color_class_button.on_click(assign_color_class)
         #Wrap class labels widgets to a box
-        label_box=widgets.HBox([class_label_widget, add_label_button, add_label_out])
+        label_button_box=widgets.HBox([class_label_widget, add_label_button])
+        #Class Labels button output message box
+        label_box_out=widgets.VBox([add_label_out])
+        #Label Box
+        label_box=widgets.VBox([label_button_box, add_label_out])
+        #Color button box
+        color_class_button_box=widgets.HBox([pick_class_color_widget, assign_color_class_button])
+        #Color button output message box
+        color_class_out_box=widgets.VBox([ass_col_class_out])
         #Wrap color widgets to a box
-        color_class_box=widgets.HBox([pick_class_color_widget, assign_color_class_button, ass_col_class_out])
+        color_class_box=widgets.VBox([color_class_button_box, color_class_out_box])
 
         self.classes_labels_box=widgets.VBox([label_box, color_class_box])
     
@@ -408,25 +430,38 @@ class InteractiveDecisionTreesGUI():
         ass_feat_group_out=widgets.Output()
         #Create the function that will be executed when we will click on the assign features to groups
         def assign_features(assft):
+            ass_feat_group_out.clear_output()
             with ass_feat_group_out:
                 self.Features_color_groups['Groups & parameters'][group_names_widget.value]=assign_features_to_group_widget.value.split()
+                print('Features assigned to Group {}'.format(group_names_widget.value))
             return self.Features_color_groups
         #Assign the above function to the button click        
         Assign_features_to_groups_button.on_click(assign_features)
         #Create a box that contains assign_features_to_group_widget and assign features to groups button
-        Assign_features_to_groups_box=widgets.HBox([assign_features_to_group_widget, Assign_features_to_groups_button, ass_feat_group_out], box_style='info')
+        Assign_features_to_groups_button_box=widgets.HBox([assign_features_to_group_widget, Assign_features_to_groups_button], box_style='info')
+        #Create a box that contains assign_features_to_group_widget and assign features to groups button
+        Assign_features_to_groups_out_box=widgets.VBox([ass_feat_group_out], box_style='info')
+        #Create a box that contains assign_features_to_group_widget and assign features to groups button
+        Assign_features_to_groups_box=widgets.VBox([Assign_features_to_groups_button_box, Assign_features_to_groups_out_box], box_style='info')
+        
         #Create button to assign color to each group
         Assign_color_to_groups_button=widgets.Button(description='Assign Color to Group', layout=Layout(width='35%'))
         ass_col_group_out=widgets.Output()
         #Create the function that will be executed when we will click on the assign color to group button
         def assign_color(asscl):
+            ass_col_group_out.clear_output()
             with ass_col_group_out:
                 self.Features_color_groups['Colors of groups'][group_names_widget.value]=[pick_group_color_widget.value]
+                print('Color {} assigned to Group {}'.format(pick_group_color_widget.value, group_names_widget.value))
             return self.Features_color_groups
         #Assign the above function to the button click
         Assign_color_to_groups_button.on_click(assign_color)
         #Create a box that contains pick_group_color_widget and Assign_color_to_groups_button
-        Assign_color_to_groups_box=widgets.HBox([pick_group_color_widget, Assign_color_to_groups_button, ass_col_group_out], box_style='info')
+        Assign_color_to_groups_button_box=widgets.HBox([pick_group_color_widget, Assign_color_to_groups_button], box_style='info')
+        #Create a box that contains the output message for pick color button
+        Assign_color_to_groups_out_box=widgets.VBox([ass_col_group_out], box_style='info')
+        #Create a box that contains pick_group_color_widget and Assign_color_to_groups_button
+        Assign_color_to_groups_box=widgets.VBox([Assign_color_to_groups_button_box, Assign_color_to_groups_out_box], box_style='info')
         #Assemble all the above widgets to one
         self.Group_feat_col_box=widgets.VBox([group_names_widget, Assign_features_to_groups_box, Assign_color_to_groups_box],  box_style='info')
     
@@ -456,6 +491,7 @@ class InteractiveDecisionTreesGUI():
                 self.Data_dict['features']=list(self.Data_dict['x'].columns)
                 self.ImpFeat = list(OrderedDict.fromkeys(self.Data_dict['features']))
                 self.ImpFeat_datestamp = datetime.datetime.now().time()
+                print('Features Selected')
         #Assign the above function to the button click
         Select_features_button.on_click(feature_selection)     
         
