@@ -1,5 +1,5 @@
 <p align="center">
-    <img width="100" height="100" src="https://github.com/Sarailidis/Interactive-Decision-Trees/edit/main/logo.png">
+    <img width="100" height="100" src="https://github.com/Sarailidis/Interactive-Decision-Trees/main/logo.png">
 </p>
 
 # Interactive-Decision-Trees
