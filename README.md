@@ -1,3 +1,7 @@
+<p align="center">
+    <img width="100" height="100" src="https://github.com/Sarailidis/Interactive-Decision-Trees/edit/main/logo.png">
+</p>
+
 # Interactive-Decision-Trees
 This repository contains modules in Python and Jupyter Lab Notebooks for Interactive Construction and analysis of Decision Trees (DT). Python modules provide functions that enable users to incorporate their domain knowledge by interacting with the DT and the InteractiveDecisionTrees Jupyter Lab notebook provides basic user-interface options for interacting with the DT for those who don't like programming.
 
