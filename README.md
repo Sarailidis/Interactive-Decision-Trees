@@ -3,6 +3,7 @@
     <h1 align="center" style="color:rgb(49,112,223);"> Interactive Decision Trees </h1>
 </p>
 
+# Description
 This repository contains modules in Python and Jupyter Lab Notebooks for Interactive Construction and analysis of Decision Trees (DT). Python modules provide functions that enable users to incorporate their domain knowledge by interacting with the DT and the InteractiveDecisionTrees Jupyter Lab notebook provides basic user-interface options for interacting with the DT for those who don't like programming.
 
 
@@ -54,7 +55,7 @@ If you have any questions or feedback, or if you spotted an error or bug, please
 # Acknowledgements
 This work was supported by the Engineering and Physical Sciences Research Council in the UK via grant EP/L016214/1 awarded for the Water Informatics: Science and Engineering (WISE) Centre for Doctoral Training, which is gratefully acknowledged.
 
-Thanks to Dan Power and Stamatis Batelis for providing helpful feedback. Thanks to Demetrios Poursanidis for designing the logo.
+Thanks to Dan Power and Stamatis Batelis for providing helpful feedback and to Demetrios Poursanidis for designing the logo.
 
 # Credits
 (cite the paper)
