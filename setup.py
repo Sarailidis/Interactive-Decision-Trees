@@ -21,12 +21,12 @@ from io import open
 
 setup(
     name='iDT',  # Required
-    version='0.0', # Required
+    version='1.0.0', # Required
     description='Toolbox for Interactive Construction and analysis of Decision Trees',  # Optional
     url='https://github.com/Sarailidis/Interactive-Decision-Trees',  # Optional
     author='Georgios Sarailidis',  # Optional
     author_email='g.sarailidis@bristol.ac.uk',  # Optional
-    packages=find_packages(exclude=['How_to_use_the_Graphical_User_Interface']),  # Required.
+    packages=find_packages(exclude=['Workflows']),  # Required.
     install_requires=[
         "sklearn==0.22.1",
         "plotly==4.7.1",
