@@ -4,7 +4,7 @@
 </p>
 
 # Description
-This repository contains the "InteractiveDT" package. The package consists of two Python modules and Jupyter Lab notebook:
+This repository contains the "InteractiveDT" package. The package consists of two Python modules and a Jupyter Lab notebook:
 1. iDT (python module) which contains the necessary classes and functions that enable the experts to interact with the DT and incorporate their scientific knowledge.
 2. iDTGUIfun (python module) which incorporates the functions and classes defined in iDT into widgets to create user interfaces that support the experts in their interactions with the DT.
 3. The two python modules are used in a Jupyter Lab notebook which is the Graphical User Interface for Interactive Construction and analysis of Decision Trees (DT). 
