@@ -14,9 +14,9 @@ Moreover, there are three workflows (datasets ara also provided in the workflows
 
 # Getting Started
 
-The python modules and Jupyter Lab notebook require ceratin packages (and versions) to be installed in order to run. Below the most convenient installation process (according to package author's view) is described:
-
 It is highly recommended to install the Anaconda Navigator (https://www.anaconda.com/products/individual-b) before proceeding with the installation of this package.
+
+The python modules and Jupyter Lab notebook require certain packages (and versions) to be installed in order to run. Therefore, it is advised to install the package in a new virtual envrionment. Below there are guidelines to create a new virtual environment and install the package there.
 
 ## How to install
 
@@ -27,7 +27,7 @@ It is highly recommended to install the Anaconda Navigator (https://www.anaconda
 
         `conda create -n InteractiveDecisionTrees anaconda`
 
-4. Activate the new created environment by copy pasting the following command in the Anaconda Prompt. 
+4. Activate the new created environment by copy pasting and running the following command in the Anaconda Prompt. 
 
         `conda activate InteractiveDecisionTrees`
 
