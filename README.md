@@ -41,7 +41,11 @@ This will force Anaconda to switch from the base environment to the new environm
 
         `pip install .`
 
-7. After installing the 'InteractiveDT' package, JupyterLab rendere support and widgets extensions need to be installed. This can be done by copy pasting and running the following commands in the anaconda prompt:
+7. After installing the 'InteractiveDT' package the node.js and npm packages need to be installed. This can been done by copy pasting and runing the following command in the anacond prompt
+
+        `conda install -c conda-forge nodejs`
+ 
+10. Finally, the JupyterLab renderer support and widgets extensions need to be installed. This can be done by copy pasting and running the following commands in the anaconda prompt:
     a. JupyterLab renderer support:
     
         `jupyter labextension install jupyterlab-plotly@4.14.3`
