@@ -63,7 +63,7 @@ If you have any questions or feedback, or if you spotted an error or bug, please
 # Acknowledgements
 This work was supported by the Engineering and Physical Sciences Research Council in the UK via grant EP/L016214/1 awarded for the Water Informatics: Science and Engineering (WISE) Centre for Doctoral Training, which is gratefully acknowledged.
 
-Thanks to Dan Power and Stamatis Batelis for providing helpful feedback and to Demetrios Poursanidis for designing the logo.
+Thanks to Dan Power, Sebastian Gnann and Stamatis Batelis for providing helpful feedback and to Demetrios Poursanidis for designing the logo.
 
 # Credits
 (cite the paper)
