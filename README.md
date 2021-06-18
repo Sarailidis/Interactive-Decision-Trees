@@ -77,6 +77,14 @@ For those who are unfamiliar with Jupyter Lab below I provide some guidelines on
 
 3. This should show you the contents of the repository:
 
+![image](https://user-images.githubusercontent.com/58266471/122567556-75126400-d051-11eb-8884-13f6cb2e16d4.png)
+
+4. Click on the "Workflows" folder. The contents of this folder should be three subfloders with the 3 case studies workflows:
+
+![image](https://user-images.githubusercontent.com/58266471/122568408-62e4f580-d052-11eb-9436-1e3278f7fcf8.png)
+
+5. Click on the one you want to practice e.g. 1st_case_study. This will show you the contents on the 1st_case_study which should be as shown below:
+
 
 
 # Contact
