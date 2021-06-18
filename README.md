@@ -67,7 +67,7 @@ For those who are unfamiliar with Jupyter Lab below I provide some guidelines on
         
         jupyter lab
 
-This should open the Jupyter Lab application and it should look similar to this:
+   This should open the Jupyter Lab application and it should look similar to this:
 
 ![image](https://user-images.githubusercontent.com/58266471/122534240-04585100-d02b-11eb-9e7a-6931bdb970ed.png)
 
