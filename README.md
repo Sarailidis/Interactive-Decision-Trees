@@ -83,8 +83,13 @@ For those who are unfamiliar with Jupyter Lab below I provide some guidelines on
 
 ![image](https://user-images.githubusercontent.com/58266471/122568408-62e4f580-d052-11eb-9436-1e3278f7fcf8.png)
 
-5. Click on the one you want to practice e.g. 1st_case_study. This will show you the contents on the 1st_case_study which should be as shown below:
+5. Click on the one you want to practice. For example, click on the 1st_case_study and it will show you the contents on the 1st_case_study which should be as below:
 
+![image](https://user-images.githubusercontent.com/58266471/122574646-89a62a80-d058-11eb-8b4f-4921f7f9a93a.png)
+
+6. Finally, click on the file named "Workflow_1st_case_study.ipynb" and it should open a notebook that looks like this:
+
+![image](https://user-images.githubusercontent.com/58266471/122576179-143b5980-d05a-11eb-912d-29839928a1fc.png)
 
 
 # Contact
