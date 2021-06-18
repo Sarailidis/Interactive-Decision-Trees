@@ -1,0 +1,10 @@
+The dataset files provided here are produced through random sampling and splitting in train and test sets from an existing large dataset produced by Sarazin (2018).
+
+Description of Sarazin (2018) dataset:
+- The dataset contains 17,000,000 simulations (data points) of a hydrological model and 34 input variables which characterize climate properties and land cover types. 
+- There are 4 classes in the dataset, namely, C1 (<20 mm/yr), C2 (20 – 100 mm/yr), C3 (100 – 300 mm/yr) and C4 (>300 mm/yr) which correspond to different recharge values.
+
+The input variables and the classes remain the same for the sample dataset with the only difference the amount of data points it contains.
+
+Reference:
+Understanding the sensitivity of karst groundwater recharge to climate and land cover changes at a large-scale, Sarrazin, F. (Author). 25 Sep 2018
