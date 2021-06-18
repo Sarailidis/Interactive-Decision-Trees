@@ -9,14 +9,16 @@ This repository contains the "InteractiveDT" package. The package consists of tw
 2. iDTGUIfun (python module) which incorporates the functions and classes defined in iDT into widgets to create user interfaces that support the experts in their interactions with the DT.
 3. The two python modules are used in a Jupyter Lab notebook which is the Graphical User Interface for Interactive Construction and analysis of Decision Trees (DT). 
 
-Moreover, there are three workflows (datasets ara also provided in the workflows folders) for anyone who wants to get familiar with the toolbox.
+Moreover, there are three workflows (datasets are also provided in the workflows folders) for anyone who wants to get familiar with the toolbox.
 
 
 # Getting Started
 
 It is highly recommended to install the Anaconda Navigator (https://www.anaconda.com/products/individual-b) before proceeding with the installation of this package.
 
-The python modules and Jupyter Lab notebook require certain packages (and versions) to be installed in order to run. Therefore, it is advised to install the package in a new virtual envrionment. Below there are guidelines to create a new virtual environment and install the package there.
+The python modules and Jupyter Lab notebook require certain packages (and versions) to be installed in order to run. Therefore, it is advised to install the package in a new virtual environment. Below there are guidelines to create a new virtual environment and install the package there.
+
+__Note:__ Depending on the computer the creation of the virtual environment and the installation of the package may take a while to complete!
 
 ## How to install
 
@@ -25,13 +27,13 @@ The python modules and Jupyter Lab notebook require certain packages (and versio
 2. Open the Anaconda Prompt
 3. Create a new virtual environment, where the package and all its dependencies will be installed, by copy pasting and running the following command in the Anaconda Prompt:
 
-        `conda create -n InteractiveDecisionTrees anaconda`
+        conda create -n InteractiveDecisionTrees anaconda
 
 4. Activate the new created environment by copy pasting and running the following command in the Anaconda Prompt. 
 
-        `conda activate InteractiveDecisionTrees`
+        conda activate InteractiveDecisionTrees
 
-This will force Anaconda to switch from the base environment to the new environment ensuring that after the installation of this package, the packages stored in the base envrionment remain untouched.
+This will force Anaconda to switch from the base environment to the new environment ensuring that after the installation of this package, the packages stored in the base environment remain untouched.
 
 5. Change the working directory to the cloned folder by using the following command:
 
@@ -39,21 +41,28 @@ This will force Anaconda to switch from the base environment to the new environm
 
 6. Then copy paste and run the following command in the Anaconda prompt. This will install the 'InteractiveDT' package in the new environment.
 
-        `pip install .`
+        pip install .
 
-7. After installing the 'InteractiveDT' package the node.js and npm packages need to be installed. This can been done by copy pasting and runing the following command in the anacond prompt
+7. After installing the 'InteractiveDT' package the node.js and npm packages need to be installed. This can been done by copy pasting and runing the following command in the Anaconda prompt
 
-        `conda install -c conda-forge nodejs`
+        conda install -c conda-forge nodejs
  
-10. Finally, the JupyterLab renderer support and widgets extensions need to be installed. This can be done by copy pasting and running the following commands in the anaconda prompt:
+10. Finally, the JupyterLab renderer support and widgets extensions need to be installed. This can be done by copy pasting and running the following commands in the Anaconda prompt:
     a. JupyterLab renderer support:
     
-        `jupyter labextension install jupyterlab-plotly@4.14.3`
+        jupyter labextension install jupyterlab-plotly@4.14.3
 
     b. Jupyter widgets extension:
     
-        `jupyter labextension install @jupyter-widgets/jupyterlab-manager plotlywidget@4.14.3`
+        jupyter labextension install @jupyter-widgets/jupyterlab-manager plotlywidget@4.14.3
+        
+11. The Graphical User Interface and the workflows are running only on Jupyter Lab. To run Jupyter Lab type and run in the Anaconda prompt the following:
+        
+        jupyter lab
 
+This should open the Jupyter Lab application and it should look similar to this:
+
+![image](https://user-images.githubusercontent.com/58266471/122534240-04585100-d02b-11eb-9e7a-6931bdb970ed.png)
 
 
 # Contact
