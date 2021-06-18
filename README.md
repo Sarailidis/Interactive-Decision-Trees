@@ -47,7 +47,8 @@ This will force Anaconda to switch from the base environment to the new environm
 
         conda install -c conda-forge nodejs
  
-10. Finally, the JupyterLab renderer support and widgets extensions need to be installed. This can be done by copy pasting and running the following commands in the Anaconda prompt:
+8. Finally, the JupyterLab renderer support and widgets extensions need to be installed. This can be done by copy pasting and running the following commands in the Anaconda prompt:
+    
     a. JupyterLab renderer support:
     
         jupyter labextension install jupyterlab-plotly@4.14.3
@@ -56,13 +57,26 @@ This will force Anaconda to switch from the base environment to the new environm
     
         jupyter labextension install @jupyter-widgets/jupyterlab-manager plotlywidget@4.14.3
         
-11. The Graphical User Interface and the workflows are running only on Jupyter Lab. To run Jupyter Lab type and run in the Anaconda prompt the following:
+Once the installation is completed __do not close the Anaconda Prompt.__ Follow the guidelines of the next section "How to run a workflow"
+
+## How to run a workflow
+
+For those who are unfamiliar with Jupyter Lab below I provide some guidelines on what to do after the installation. These include how to open the Jupyter Lab application and run a workflow.
+
+1. The Graphical User Interface and the workflows are running only on Jupyter Lab. In the Anaconda prompt (used for the installation of the package) type and run the following:
         
         jupyter lab
 
 This should open the Jupyter Lab application and it should look similar to this:
 
 ![image](https://user-images.githubusercontent.com/58266471/122534240-04585100-d02b-11eb-9e7a-6931bdb970ed.png)
+
+2. On the left hand side find and click on the folder icon:
+
+![image](https://user-images.githubusercontent.com/58266471/122539344-2accbb00-d030-11eb-99bf-a216f2fce302.png)
+
+3. This should show you the contents of the repository:
+
 
 
 # Contact
