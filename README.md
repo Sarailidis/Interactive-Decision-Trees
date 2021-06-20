@@ -18,7 +18,6 @@ It is highly recommended to install the Anaconda Navigator (https://www.anaconda
 
 The python modules and Jupyter Lab notebook require certain packages (and versions) to be installed in order to run. Therefore, it is advised to install the package in a new virtual environment. Below there are guidelines to create a new virtual environment and install the package there.
 
-__Note:__ Depending on the computer the creation of the virtual environment and the installation of the package may take a while to complete!
 
 ## How to install
 
@@ -28,6 +27,8 @@ __Note:__ Depending on the computer the creation of the virtual environment and 
 3. Create a new virtual environment, where the package and all its dependencies will be installed, by copy pasting and running the following command in the Anaconda Prompt:
 
         conda create -n InteractiveDecisionTrees anaconda
+        
+__Note:__ Depending on the computer the creation of the virtual environment may take a while to complete!
 
 4. Activate the new created environment by copy pasting and running the following command in the Anaconda Prompt. 
 
@@ -42,6 +43,8 @@ This will force Anaconda to switch from the base environment to the new environm
 6. Then copy paste and run the following command in the Anaconda prompt. This will install the 'InteractiveDT' package in the new environment.
 
         pip install .
+        
+__Note:__ Depending on the computer the installation of the package may take a while to complete!
 
 7. After installing the 'InteractiveDT' package the node.js and npm packages need to be installed. This can been done by copy pasting and runing the following command in the Anaconda prompt
 
