@@ -111,9 +111,9 @@ If you have any questions or feedback, or if you spotted an error or bug, please
 # Acknowledgements
 This work was supported by the Engineering and Physical Sciences Research Council in the UK via grant EP/L016214/1 awarded for the Water Informatics: Science and Engineering (WISE) Centre for Doctoral Training, which is gratefully acknowledged.
 
-Thanks to the authors of the paper Almeida et al, (2017) NHESS (https://doi.org/10.5194/nhess-17-225-2017) for kindly providing me with their dataset. This dataset used in the first case study workflow. 
+Thanks to the authors of the paper Almeida et al, (2017) NHESS (https://doi.org/10.5194/nhess-17-225-2017) for kindly providing me with their dataset. This dataset is used in the first case study workflow. 
 
-Thanks to Fanny Sarrazin for providing me with the dataset which she created for her thesis (https://research-information.bris.ac.uk/en/studentTheses/understanding-the-sensitivity-of-karst-groundwater-recharge-to-cl).  This datasets is used in the second and third case studies workflows as a a basis for creating sample datasets through random sampling.
+Thanks to Fanny Sarrazin for providing me with the dataset she created in her thesis (https://research-information.bris.ac.uk/en/studentTheses/understanding-the-sensitivity-of-karst-groundwater-recharge-to-cl).  This dataset is used in the second and third case studies workflows as a a basis for creating sample datasets through random sampling.
 
 Thanks to Dan Power, Sebastian Gnann and Stamatis Batelis for providing helpful feedback and to Demetrios Poursanidis for designing the logo.
 
