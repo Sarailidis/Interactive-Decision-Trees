@@ -114,6 +114,6 @@ This work was supported by the Engineering and Physical Sciences Research Counci
 Thanks to Dan Power, Sebastian Gnann and Stamatis Batelis for providing helpful feedback and to Demetrios Poursanidis for designing the logo.
 
 # Credits
-(cite the paper)
+Sarailidis, G., Wagener, T. and Pianosi, F. (2021). Integrating Scientific Knowledge into Machine Learning using Interactive Decision Trees. submitted in Environmental Modelling and Software.
 
 # License
