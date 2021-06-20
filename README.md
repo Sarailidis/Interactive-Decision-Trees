@@ -60,13 +60,19 @@ The python modules and Jupyter Lab notebook require certain packages (and versio
     
         jupyter labextension install @jupyter-widgets/jupyterlab-manager plotlywidget@4.14.3
         
-Once the installation is completed __do not close the Anaconda Prompt.__ Follow the guidelines of the next section "How to run a workflow"
+9. Once the installation is completed type and run the following command to run Jupyter Lab application:
+
+        jupyter lab
+
+To use the Graphical User Interface you need to run the InteractiveDecisionTrees.ipynb file in Jupyter Lab.
+
+For those who are unfamiliar with Jupyter Lab I provide some guidelines on how to use Jupyter Lab and run a workflow.
 
 ## How to run a workflow
 
 For those who are unfamiliar with Jupyter Lab below I provide some guidelines on what to do after the installation. These include how to open the Jupyter Lab application and run a workflow.
 
-1. The Graphical User Interface and the workflows are running only on Jupyter Lab. In the Anaconda prompt (used for the installation of the package) type and run the following:
+1. Open the Anaconda prompt, type and run the following:
         
         jupyter lab
 
@@ -81,6 +87,8 @@ For those who are unfamiliar with Jupyter Lab below I provide some guidelines on
 3. This should show you the contents of the repository:
 
 ![image](https://user-images.githubusercontent.com/58266471/122567556-75126400-d051-11eb-8884-13f6cb2e16d4.png)
+
+To run the Graphical User Interface click on the InteractiveDecisionTrees.ipynb. To run a workflow follow the steps below.
 
 4. Click on the "Workflows" folder. The contents of this folder should be three subfloders with the 3 case studies workflows:
 
