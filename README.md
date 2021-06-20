@@ -34,7 +34,7 @@ The python modules and Jupyter Lab notebook require certain packages (and versio
 
         conda activate InteractiveDecisionTrees
 
-This will force Anaconda to switch from the base environment to the new environment ensuring that after the installation of this package, the packages stored in the base environment remain untouched.
+    This will force Anaconda to switch from the base environment to the new environment ensuring that after the installation of this package, the packages stored in the base environment remain untouched.
 
 5. Change the working directory to the cloned folder by using the following command:
 
