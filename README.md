@@ -102,6 +102,7 @@ To run the Graphical User Interface click on the InteractiveDecisionTrees.ipynb.
 
 ![image](https://user-images.githubusercontent.com/58266471/122576179-143b5980-d05a-11eb-912d-29839928a1fc.png)
 
+To run the workflow read the contents of the workflow and you will be guided on what to do in the case study. To run the cells in the workflow you just need to click on the play button on the top of the workflow.
 
 # Contact
 If you have any questions or feedback, or if you spotted an error or bug, please email Georgios Sarailidis (g.sarailidis@bristol.ac.uk)
