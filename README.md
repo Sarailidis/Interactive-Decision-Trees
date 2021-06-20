@@ -28,7 +28,7 @@ The python modules and Jupyter Lab notebook require certain packages (and versio
 
         conda create -n InteractiveDecisionTrees anaconda
         
-__Note:__ Depending on the computer the creation of the virtual environment may take a while to complete!
+    __Note:__ Depending on the computer the creation of the virtual environment may take a while to complete!
 
 4. Activate the new created environment by copy pasting and running the following command in the Anaconda Prompt. 
 
@@ -44,7 +44,7 @@ This will force Anaconda to switch from the base environment to the new environm
 
         pip install .
         
-__Note:__ Depending on the computer the installation of the package may take a while to complete!
+    __Note:__ Depending on the computer the installation of the package may take a while to complete!
 
 7. After installing the 'InteractiveDT' package the node.js and npm packages need to be installed. This can been done by copy pasting and runing the following command in the Anaconda prompt
 
