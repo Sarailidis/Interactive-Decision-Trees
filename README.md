@@ -38,7 +38,7 @@ The python modules and Jupyter Lab notebook require certain packages (and versio
 
 5. Change the working directory to the cloned folder by using the following command:
 
-        cd path_to_the_folder
+        cd [add path to repository]
 
 6. Then copy paste and run the following command in the Anaconda prompt. This will install the 'InteractiveDT' package in the new environment.
 
