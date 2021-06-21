@@ -1,4 +1,4 @@
-The dataset files provided here are produced through random sampling and splitting in train and test sets from an existing large dataset produced by Sarazin (2018).
+The dataset files provided here are produced through random sampling and splitting in train and test sets from an existing revised version of the dataset produced by Sarazin (2018) which was kindly provided for the purposes of this project.
 
 Description of Sarazin (2018) dataset:
 - The dataset contains 17,000,000 simulations (data points) of a hydrological model and 34 input variables which characterize climate properties and land cover types. 
