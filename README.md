@@ -3,6 +3,8 @@
     <h1 align="center" style="color:rgb(49,112,223);"> Interactive Decision Trees </h1>
 </p>
 
+[![DOI](https://zenodo.org/badge/355970266.svg)](https://zenodo.org/badge/latestdoi/355970266)
+
 # Description
 This repository contains the "InteractiveDT" package. The package consists of two Python modules and a Jupyter Lab notebook:
 1. iDT (python module) which contains the necessary classes and functions that enable the experts to interact with the DT and incorporate their scientific knowledge.
