@@ -70,7 +70,7 @@ The python modules and Jupyter Lab notebook require certain packages (and versio
 
 To use the Graphical User Interface you need to run the InteractiveDecisionTrees.ipynb file in Jupyter Lab.
 
-For those who are unfamiliar with Jupyter Lab I provide some guidelines on how to use Jupyter Lab and run a workflow.
+For those who are unfamiliar with Jupyter Lab I provide some guidelines on how to use Jupyter Lab on https://github.com/Sarailidis/Interactive-Decision-Trees/wiki/How-to-run-a-workflow. 
 
 ## How to run a workflow
 
