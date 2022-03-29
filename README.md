@@ -87,7 +87,7 @@ Thanks to Fanny Sarrazin for providing me with the revised version of the datase
 Thanks to Dan Power, Sebastian Gnann and Stamatis Batelis for providing helpful feedback and to Demetrios Poursanidis for designing the logo.
 
 # Credits
-Sarailidis, G., Wagener, T. and Pianosi, F. (2021). Integrating Scientific Knowledge into Machine Learning using Interactive Decision Trees. submitted in Environmental Modelling and Software.
+Sarailidis, G., Wagener, T. and Pianosi, F. (2021). Integrating Scientific Knowledge into Machine Learning using Interactive Decision Trees. submitted in Computers and Geosciences.
 
 # License
 This software is distributed under the GNU Public License Version 3. See https://www.gnu.org/licenses/gpl-3.0.en.html for details.
