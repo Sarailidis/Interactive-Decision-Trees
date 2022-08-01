@@ -60,13 +60,13 @@ The python modules and Jupyter Lab notebook require certain packages (and versio
     
         jupyter labextension install jupyterlab-plotly@4.14.3
         
-    __Note:__ Depending on the computer the installation may take a while.
+    __Note:__ Depending on the computer the installation may take a while to complete!
 
     b. Jupyter widgets extension:
     
         jupyter labextension install @jupyter-widgets/jupyterlab-manager plotlywidget@4.14.3
        
-    __Note:__ Depending on the computer the installation may take a while.
+    __Note:__ Depending on the computer the installation may take a while to complete!
         
 9. Once the installation is completed type and run the following command to run Jupyter Lab application:
 
