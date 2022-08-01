@@ -51,6 +51,8 @@ The python modules and Jupyter Lab notebook require certain packages (and versio
 7. After installing the 'InteractiveDT' package the node.js and npm packages need to be installed. This can been done by copy pasting and runing the following command in the Anaconda prompt
 
         conda install -c conda-forge nodejs
+        
+    __Note:__ Depending on the computer the installation of the packages may take a while to complete!
  
 8. Finally, the JupyterLab renderer support and widgets extensions need to be installed. This can be done by copy pasting and running the following commands in the Anaconda prompt:
     
@@ -58,13 +60,13 @@ The python modules and Jupyter Lab notebook require certain packages (and versio
     
         jupyter labextension install jupyterlab-plotly@4.14.3
         
-    Depending on the computer this may take a while.
+    __Note:__ Depending on the computer the installation may take a while.
 
     b. Jupyter widgets extension:
     
         jupyter labextension install @jupyter-widgets/jupyterlab-manager plotlywidget@4.14.3
        
-    Depending on the computer this may take a while.
+    __Note:__ Depending on the computer the installation may take a while.
         
 9. Once the installation is completed type and run the following command to run Jupyter Lab application:
 
