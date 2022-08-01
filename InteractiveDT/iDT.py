@@ -49,6 +49,8 @@ import warnings
 from InteractiveDT import iDT
 #import plotly.express as px
 
+#Import library necessary for various system functions
+import os
 
 
 ############################################################################################################################################################################################################
@@ -1536,18 +1538,20 @@ def change_class(node_id, TreeObject, new_class):
     '''
     
     if isinstance(TreeObject, TreeStructure):
+        #Check for invalid user inputs:
         #Check if the node_id given by the user is a leaf_node
         if TreeObject.feature_labels[node_id] != 'leaf_node':
-            raise ValueError('The node id given does not correspond to a leaf node.')
-        
-        TreeObject.Node_classes[node_id] = new_class
+            raise ValueError('The node id must be a leaf node. A test node id is given') from None
+        else:
+            TreeObject.Node_classes[node_id] = new_class
     
     if isinstance(TreeObject, pd.DataFrame):
+        #Check for invalid user inputs:
         #Check if the node_id given by the user is a leaf_node
         if TreeObject.loc[node_id,'nodes_labels'] != 'leaf_node':
-            raise ValueError('The node id given does not correspond to a leaf node.')
-        
-        TreeObject.loc[node_id,'nodes_classes'] = new_class
+            raise ValueError('The node id must be a leaf node. A test node id is given') from None  
+        else:
+            TreeObject.loc[node_id,'nodes_classes'] = new_class
         
             
 
@@ -2127,13 +2131,17 @@ class ManualPruning:
 
             #Check the input node id: Valid node ID
             if self.node_id==0 or self.node_id<0:
-                raise ValueError('Node ID should be greater than 0')
+                print('Node ID should be greater than 0')
             elif self.node_id>0:
-                if TreeObject.Links[self.node_id][0] in TreeObject.leaves and TreeObject.Links[self.node_id][1] in TreeObject.leaves:
-                    nodes_pr=smallest_branch(self.node_id, TreeObject)
-                    nodes_pr.append(self.node_id)
+                #Check if the input node id is a leaf. If yes, raise an Error:
+                if self.node_id in TreeObject.leaves:
+                    print("The id of the node to be pruned must not be a leaf. An id of a leaf node is given")
                 else:
-                    nodes_pr=nodes_to_prune(self.node_id, TreeObject)
+                    if TreeObject.Links[self.node_id][0] in TreeObject.leaves and TreeObject.Links[self.node_id][1] in TreeObject.leaves:
+                        nodes_pr=smallest_branch(self.node_id, TreeObject)
+                        nodes_pr.append(self.node_id)
+                    else:
+                        nodes_pr=nodes_to_prune(self.node_id, TreeObject)
 
         
         if isinstance(TreeObject, pd.DataFrame):
@@ -2149,13 +2157,17 @@ class ManualPruning:
 
             #Check the input node id: Valid node ID
             if self.node_id==0 or self.node_id<0:
-                raise ValueError('Node ID should be greater than 0')
+                print('Node ID should be greater than 0')
             elif self.node_id>0:
-                if Tree_edges.Edges['links'][self.node_id][0] in leaves_list and Tree_edges.Edges['links'][self.node_id][1] in leaves_list:
-                    nodes_pr=smallest_branch(self.node_id, TreeObject)
-                    nodes_pr.append(self.node_id)
+                #Check if the input node id is a leaf. If yes, raise an Error:
+                if self.node_id in leaves_list:
+                    print("The id of the node to be pruned must not be a leaf. An id of a leaf node is given")
                 else:
-                    nodes_pr=nodes_to_prune(self.node_id, TreeObject)
+                    if Tree_edges.Edges['links'][self.node_id][0] in leaves_list and Tree_edges.Edges['links'][self.node_id][1] in leaves_list:
+                        nodes_pr=smallest_branch(self.node_id, TreeObject)
+                        nodes_pr.append(self.node_id)
+                    else:
+                        nodes_pr=nodes_to_prune(self.node_id, TreeObject)
         
         #PRUNE THE TREE:
 

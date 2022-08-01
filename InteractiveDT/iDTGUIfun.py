@@ -59,14 +59,20 @@ import io # This module provides the Python interfaces to stream handling
 #Libraries necessary for random sampling
 import random
 
-#Import library to store system time
+#Import library necessary for various system functions
+import os
 import datetime
+import sys
+
+
 
 
 #Suppress useless warnings
 import warnings
 #ignore by message
 warnings.filterwarnings("ignore")
+
+
 
 
 
@@ -95,11 +101,16 @@ def import_file(filename, sample_size=None, random_sampling=False, header=None, 
         filename= filename
         n = sum(1 for line in open(filename)) - 1 #number of records in file (excludes header)
         s = sample_size #desired sample size
-        skip = sorted(random.sample(range(1,n+1),n-s)) #the 0-indexed header will not be included in the skip list
-        dataset_sample = pd.read_csv(filename, skiprows=skip, index_col=index_col) #pandas.read_csv(filename, skiprows=skip)
-        
-        dataset_df=iDT.Data_Preprocessing.Data_Preparation(filename=dataset_sample, header=header, index_col=index_col, train_test_splitting=train_test_splitting, 
-                                                             test_size=test_size, random_state=random_state)
+        #check for invalid user input:
+        if s>=n:
+            print('Dataset not loaded! \nSample size must not be larger than the population.')
+            dataset_df = pd.DataFrame()
+        else:
+            skip = sorted(random.sample(range(1,n+1),n-s)) #the 0-indexed header will not be included in the skip list
+            dataset_sample = pd.read_csv(filename, skiprows=skip, index_col=index_col) #pandas.read_csv(filename, skiprows=skip)
+
+            dataset_df=iDT.Data_Preprocessing.Data_Preparation(filename=dataset_sample, header=header, index_col=index_col, train_test_splitting=train_test_splitting, 
+                                                                 test_size=test_size, random_state=random_state)
     
     return dataset_df
 
@@ -193,7 +204,7 @@ def new_feature(Features_color_groups, equation, new_feature_name, features_labe
         Features_color_groups['Groups & parameters'][group_name].append(new_feature_name)
 
     
-    
+
     
     
     
@@ -253,18 +264,35 @@ class InteractiveDecisionTreesGUI():
         opacity_nodes:              A float indicating the opacity of the nodes in the plot
         show_figure:                Whether to show the figure or not. It can be either True or False. Default to True.
         '''
-        #Classify a tree with the default values for the various paramaters.
-        #In this way the user will be able to manipulate all the paramaters.
-        tree_base=tree.DecisionTreeClassifier(ccp_alpha=0, class_weight=None, criterion=criterion, max_depth=max_depth, max_features=max_features, 
-                                              max_leaf_nodes=max_leaf_nodes, min_impurity_decrease=min_impurity_decrease, min_impurity_split=None, min_samples_leaf=min_samples_leaf, 
-                                              min_samples_split=min_samples_split, min_weight_fraction_leaf=0.0, random_state=random_state, 
-                                              splitter=splitter)
-        tree_base.fit(self.Data_dict['x'], self.Data_dict['y']) #it was: tree_base.fit(x,y) and iDT.TreeStructure(Tree=tree_base, features=features,  X=x, Y=outputs_complete_dataset, classes_labels=classes_labels, outputs_train=y)
-        TreeStructureBase=iDT.TreeStructure(Tree=tree_base, features=self.Data_dict['features'],  X=self.Data_dict['x'], Y=self.Data_dict['outputs_complete_dataset'], 
-                                              classes_dict=self.classes_dict, outputs_train=self.Data_dict['outputs_train'])
-        iDT.Plot_Tree(TreeStructureBase, classes_dict=self.classes_dict, criterion=criterion, nodes_coloring=nodes_coloring, edges_shape=edges_shape, 
-                        User_features_color_groups=None if nodes_coloring != 'Features_color_groups' else self.Features_color_groups, 
-                        plot_width=plot_width, plot_height=plot_height, mrk_size=mrk_size, txt_size=txt_size, opacity_edges=opacity_edges, opacity_nodes=opacity_nodes, show_figure=True)
+        #Checking for invalid user inputs
+        maximum_features = len(self.Data_dict['features'])
+        if max_features>maximum_features:
+            print(f"Max_features must not exceed the maximum number of available features in the dataset {maximum_features}. A value > {maximum_features} is given. Enter a value <= {maximum_features}.") 
+        elif max_features<=0:
+            print(f"Max_features must be greater than 0. A value <= 0 is given. Enter a value > 0.")  # Alternatively if I want to show an error message: raise ValueError(f"Max_features must be greater than 0") from None
+        elif min_samples_leaf<1:
+            print(f"Min_samples_leaf must be greater than or equal to 1. A value < 1 is given. Enter a value >= 1")
+        elif min_samples_split<=1:
+            print(f"Min_samples_split must be greater than 1. A value <= 1 is given. Enter a value > 1.")
+        elif max_depth<1:
+            print(f"Max depth must be greater than 0. A value <= 0 is given. Enter a value > 1.")
+        elif max_leaf_nodes<= 1:
+            print(f"Max leaf nodes must be greater than 1. A value <= 1 is given. Enter a value > 1.") 
+        elif (nodes_coloring == 'Features_color_groups' and len(self.Features_color_groups['Groups & parameters']) == 0):
+            print(f"No variables assigned to groups. To use this nodes coloring option, assign variables to groups using the corresponding tool in the Preprocessing Stage tab ")
+        else:
+            #Classify a tree with the default values for the various paramaters.
+            #In this way the user will be able to manipulate all the paramaters.       
+            tree_base=tree.DecisionTreeClassifier(ccp_alpha=0, class_weight=None, criterion=criterion, max_depth=max_depth, max_features=max_features, 
+                                                  max_leaf_nodes=max_leaf_nodes, min_impurity_decrease=min_impurity_decrease, min_impurity_split=None, min_samples_leaf=min_samples_leaf, 
+                                                  min_samples_split=min_samples_split, min_weight_fraction_leaf=0.0, random_state=random_state, 
+                                                  splitter=splitter)
+            tree_base.fit(self.Data_dict['x'], self.Data_dict['y']) #it was: tree_base.fit(x,y) and iDT.TreeStructure(Tree=tree_base, features=features,  X=x, Y=outputs_complete_dataset, classes_labels=classes_labels, outputs_train=y)
+            TreeStructureBase=iDT.TreeStructure(Tree=tree_base, features=self.Data_dict['features'],  X=self.Data_dict['x'], Y=self.Data_dict['outputs_complete_dataset'], 
+                                                  classes_dict=self.classes_dict, outputs_train=self.Data_dict['outputs_train'])
+            iDT.Plot_Tree(TreeStructureBase, classes_dict=self.classes_dict, criterion=criterion, nodes_coloring=nodes_coloring, edges_shape=edges_shape, 
+                            User_features_color_groups=None if nodes_coloring != 'Features_color_groups' else self.Features_color_groups, 
+                            plot_width=plot_width, plot_height=plot_height, mrk_size=mrk_size, txt_size=txt_size, opacity_edges=opacity_edges, opacity_nodes=opacity_nodes, show_figure=True)
     
     #Create the appropriate widgets for importing files
     def ImportDatasetGUI(self):
@@ -293,50 +321,85 @@ class InteractiveDecisionTreesGUI():
         def load_file(ldf, train_test_splitting=self.Train_test_splitting.value):
             Import_files_out.clear_output()
             with Import_files_out:
-                dataset_dict=import_file(filename=filename_widget.value, sample_size=Sample_size_widget.value, random_sampling=Random_sampling_widget.value, 
-                                         header=None if Header_widget.value==-1 else Header_widget.value, index_col=None if Index_col_widget.value==-1 else Index_col_widget.value,
-                                         sep = Sep_widget.value, train_test_splitting=self.Train_test_splitting.value, test_size=test_size_widget.value, 
-                                         random_state=Random_state_widget.value)
+                #Check for invalid user inputs:
+                #Empty file name:
+                if filename_widget.value == '':
+                    print("Filename must not be empty. An empty string is given. Type a name.")
+                #Invalid filename. Not in the working directory.
+                elif filename_widget.value not in os.listdir():
+                    print("File doesn't exist in the current working directory. Type a valid filename")
+                else:
+                    n = sum(1 for line in open(filename_widget.value)) - 1 #number of records in file (excludes header)
+                    #Invalind sample size
+                    #User input a sample size equal or less than zero.
+                    if (Random_sampling_widget.value == True and Sample_size_widget.value <=0):
+                        print('Dataset not loaded! \nWhen Random Sampling is enabled, sample size must be greater than zero. A value <= 0 is given. Enter a value > 0.')
+                    elif (Random_sampling_widget.value == True and Sample_size_widget.value>=n):
+                        print(f"Dataset not loaded! \nSample size must not be larger than the population {n}. A value >= {n} is given. Enter a value < {n}")
+                    #Invalid test size
+                    else:
+                        if (self.Train_test_splitting.value == True and Random_sampling_widget.value == True and test_size_widget.value <= 0):
+                            print(f"Dataset not loaded! Test size dataset must be in the range [0,1] or positive, integer smaller than the sample size {Sample_size_widget.value}. Enter any value within [0,1] or an integer within [0, {Sample_size_widget.value}]")
+                        elif (self.Train_test_splitting.value == True and Random_sampling_widget.value == False and test_size_widget.value <= 0):
+                            print(f"Dataset not loaded! Test size dataset must be in the range [0,1] or positive, integer smaller than the population {n}. Enter any value within [0,1] or an integer within [0, {n}].")
+                        elif (self.Train_test_splitting.value == True and Random_sampling_widget.value == True and test_size_widget.value > Sample_size_widget.value):
+                            print(f"Dataset not loaded! Test size dataset must be in the range [0,1] or positive, integer smaller than the sample size {Sample_size_widget.value}. Enter any value within [0,1] or an integer within [0, {Sample_size_widget.value}]")
+                        elif (self.Train_test_splitting.value == True and Random_sampling_widget.value == False and test_size_widget.value > n):
+                            print(f"Dataset not loaded! Test size dataset must be in the range [0,1] or positive, integer than the population {n}. Enter any value within [0,1] or an integer within [0, {n}].")
+                        elif (self.Train_test_splitting.value == True and Random_sampling_widget.value == True and test_size_widget.value > 1 and type(test_size_widget.value) == float):
+                            print(f"Dataset not loaded! Test size dataset must be in the range [0,1] or positive, integer smaller than the population {n}. Enter any value within [0,1] or an integer within [0, {Sample_size_widget.value}]")
+                        elif (self.Train_test_splitting.value == True and Random_sampling_widget.value == False and test_size_widget.value > 1 and type(test_size_widget.value) == float):
+                            print(f"Dataset not loaded! Test size dataset must be in the range [0,1] or a positive, integer smaller than the population {n}. Enter any value within [0,1] or an integer within [0, {n}]")
+                        else:
+                            dataset_dict=import_file(filename=filename_widget.value, sample_size=Sample_size_widget.value, random_sampling=Random_sampling_widget.value, 
+                                                     header=None if Header_widget.value==-1 else Header_widget.value, index_col=None if Index_col_widget.value==-1 else Index_col_widget.value,
+                                                     sep = Sep_widget.value, train_test_splitting=self.Train_test_splitting.value, test_size=test_size_widget.value, 
+                                                     random_state=Random_state_widget.value)
 
-                self.Data_dict['x']=dataset_dict['x'] 
-                self.Data_dict['y']=dataset_dict['y']
-                self.Data_dict['z']=dataset_dict['z']
-                self.Data_dict['w']=dataset_dict['w']
-                self.Data_dict['features']=dataset_dict['features']
-                self.Data_dict['outputs_complete_dataset']=dataset_dict['outputs_complete_dataset']
-                self.Data_dict['inputs_complete_dataset']=dataset_dict['inputs_complete_dataset']
-                self.Data_dict['outputs_train']=dataset_dict['outputs_train']
+                            self.Data_dict['x']=dataset_dict['x'] 
+                            self.Data_dict['y']=dataset_dict['y']
+                            self.Data_dict['z']=dataset_dict['z']
+                            self.Data_dict['w']=dataset_dict['w']
+                            self.Data_dict['features']=dataset_dict['features']
+                            self.Data_dict['outputs_complete_dataset']=dataset_dict['outputs_complete_dataset']
+                            self.Data_dict['inputs_complete_dataset']=dataset_dict['inputs_complete_dataset']
+                            self.Data_dict['outputs_train']=dataset_dict['outputs_train']
 
-                #Convert -inf and inf values to nan values
-                self.Data_dict['x'].replace(-np.inf, np.nan)
-                self.Data_dict['x'].replace(np.inf, np.nan)
+                            #Convert -inf and inf values to nan values
+                            self.Data_dict['x'].replace(-np.inf, np.nan)
+                            self.Data_dict['x'].replace(np.inf, np.nan)
 
-                #Find the indexes of NaN values
-                indexes=[]
-                for lbl in self.Data_dict['x'].columns:
-                    idx=self.Data_dict['x'][self.Data_dict['x'].loc[:,lbl].isnull()].index.tolist()
-                    if len(idx)>0:
-                        indexes.append(idx)
+                            #Find the indexes of NaN values
+                            indexes=[]
+                            for lbl in self.Data_dict['x'].columns:
+                                idx=self.Data_dict['x'][self.Data_dict['x'].loc[:,lbl].isnull()].index.tolist()
+                                if len(idx)>0:
+                                    indexes.append(idx)
 
-                #Flatten the list (make a single list from a list of lists)        
-                indexes = [item for items in indexes for item in items]
-                #Remove duplicates from the list
-                indexes=list(set(indexes))
+                            #Flatten the list (make a single list from a list of lists)        
+                            indexes = [item for items in indexes for item in items]
+                            #Remove duplicates from the list
+                            indexes=list(set(indexes))
 
-                #Drop the corresponding NaN values from the dataset
-                #First from the output dataset
-                if train_test_splitting == True:
-                    self.Data_dict['y'].drop(indexes, inplace=True)
-                    self.Data_dict['outputs_complete_dataset'].drop(indexes, inplace=True)
-                    #Then from the input dataset
-                    self.Data_dict['x'].dropna(inplace=True)
-                    self.Data_dict['inputs_complete_dataset'].dropna(inplace=True)
-                elif train_test_splitting == False:
-                    self.Data_dict['y'].drop(indexes, inplace=True)
-                    #Then from the input dataset
-                    self.Data_dict['x'].dropna(inplace=True)
-                
-                print('Dataset loaded!')
+                            #Drop the corresponding NaN values from the dataset
+                            #First from the output dataset
+                            if train_test_splitting == True:
+                                #check for invalid user inputs
+                                if test_size_widget.value <= 0:
+                                    print("Test size dataset must be greater than 0. A value <= 0 is given. Enter a value > 0.")
+                                else:
+                                    self.Data_dict['y'].drop(indexes, inplace=True)
+                                    self.Data_dict['outputs_complete_dataset'].drop(indexes, inplace=True)
+                                    #Then from the input dataset
+                                    self.Data_dict['x'].dropna(inplace=True)
+                                    self.Data_dict['inputs_complete_dataset'].dropna(inplace=True)
+                            elif train_test_splitting == False:
+                                self.Data_dict['y'].drop(indexes, inplace=True)
+                                #Then from the input dataset
+                                self.Data_dict['x'].dropna(inplace=True)
+
+                            print("Dataset loaded")
+                    
 
         #Assign the above function to the button click
         Import_files_button.on_click(load_file)
@@ -380,9 +443,13 @@ class InteractiveDecisionTreesGUI():
         def add_label(addlbl):
             add_label_out.clear_output()
             with add_label_out:
-                classes_labels.append(class_label_widget.value)
-                self.classes_dict['Classes Labels']=classes_labels
-                print('Class {} Added'.format(class_label_widget.value))
+                #check for invalid user inputs
+                if class_label_widget.value == '':
+                    print("The class name must not be empty. An empty class name is given. Type a name for the class.")
+                else:
+                    classes_labels.append(class_label_widget.value)
+                    self.classes_dict['Classes Labels']=classes_labels
+                    print('Class {} Added'.format(class_label_widget.value))
             return self.classes_dict
         #Assign the above function to the button click        
         add_label_button.on_click(add_label)
@@ -416,7 +483,7 @@ class InteractiveDecisionTreesGUI():
     #Create the appropriate widgets for pregrouping the features and assigning colors to the groups
     def PregroupFeaturesGUI(self):
         '''
-        This method creates the necessary widgets, functions and the GUI that enable the expert to pre-group features and pick a color for each group.
+        This method creates the necessary widgets, functions and the GUI that enable the expert to pre-group variables and pick a color for each group.
         '''
         #Create a widgets for typing the group name
         group_names_widget=widgets.Text(value='', placeholder='Type the group name', description='Group', style = {'description_width': 'initial'}, disabled=False)
@@ -424,14 +491,25 @@ class InteractiveDecisionTreesGUI():
         pick_group_color_widget=widgets.ColorPicker(concise=False, description='Pick a color', value='blue', style = {'description_width': 'initial'}, disabled=False)
         #Create widgets for assigning parameters for each group
         style = {'description_width': 'initial'}
-        assign_features_to_group_widget=widgets.Text(value='', placeholder='Assign features to group', description='Features', style = {'description_width': 'initial'}, disabled=False)
+        assign_features_to_group_widget=widgets.Text(value='', placeholder='Assign variables to group', description='Variables', style = {'description_width': 'initial'}, disabled=False)
         #Create button to assign features to each group
-        Assign_features_to_groups_button=widgets.Button(description='Assign Features to Group', layout=Layout(width='35%'))
+        Assign_features_to_groups_button=widgets.Button(description='Assign variables to Group', layout=Layout(width='35%'))
         ass_feat_group_out=widgets.Output()
         #Create the function that will be executed when we will click on the assign features to groups
         def assign_features(assft):
             ass_feat_group_out.clear_output()
             with ass_feat_group_out:
+                #check for invalid user inputs:
+                #Empty group name
+                if group_names_widget.value == '':
+                    print("Group name must not be empty. An empty string is given. Type a name for the group")
+                #Empty variables names
+                elif assign_features_to_group_widget.value == '':
+                    print("Variables must not be empty. Type the variables names (as they're named in the dataset and space separated).")
+                #Invalid variables names
+                for i in assign_features_to_group_widget.value.split():
+                    if i not in self.Data_dict['features']:
+                        print(f"Variable {i} not in dataset. Type variable names included in the dataset (space separated)")
                 self.Features_color_groups['Groups & parameters'][group_names_widget.value]=assign_features_to_group_widget.value.split()
                 print('Features assigned to Group {}'.format(group_names_widget.value))
             return self.Features_color_groups
@@ -539,52 +617,64 @@ class InteractiveDecisionTreesGUI():
                          splitter=splitter_widget, nodes_coloring=nodes_coloring_widget, edges_shape=edges_shape_widget, plot_width= plot_width_widget, plot_height=plot_height_widget, 
                          mrk_size=mrk_size_widget, txt_size =txt_size_widget, opacity_edges=opacity_edges_widget, opacity_nodes=opacity_nodes_widget);
         inter_3.widget.layout.display = 'none'
-        
+
         #Create a layout for interact function
         controls_label = widgets.HBox([widgets.Label(value="Decision Tree Structure Controlling Parameters and Plot Formatting")])
         controls_widgs = widgets.HBox(inter_3.widget.children[:-1], layout = Layout(flex_flow='row wrap'))
         controls = widgets.VBox([controls_label, controls_widgs])
         controls.layout.border = "1px solid"
         inter_output = inter_3.widget.children[-1]
-        
+
         #Widgets for the creation of the new variable
         #Widget for the variable name
         Variable_name_widget=widgets.Text(value='', placeholder='Type Variable Name', description='Variable Name:', style = {'description_width': 'initial'}, layout=Layout(width='20%'), disabled=False)
         #Widget to assign the new variable to a color group
         Group_name_widget=widgets.Text(value='', placeholder='Type the group Name', description='Group Name', style = {'description_width': 'initial'}, layout=Layout(width='20%'), disabled=False)
-        
+
         #Widget to write a new equation
         Equation_widget=widgets.Text(value='', placeholder='Type equation', description='Equation:', style = {'description_width': 'initial'}, layout=Layout(width='20%'), disabled=False)
         Equation_button=widgets.Button(description='Create Feature')
         eq_out=widgets.Output()
-        
+
         #Create the functions that will be executed when we will click on the buttons
         self.NewFeat_datestamp = 0
         def create_feature(updt):
             eq_out.clear_output()
             with eq_out:
-                new_feature(self.Features_color_groups, Equation_widget.value, Variable_name_widget.value, self.Data_dict['features'], self.Data_dict['x'], Group_name_widget.value)
-                new_feature(self.Features_color_groups, Equation_widget.value, Variable_name_widget.value, self.Data_dict['features'], self.Data_dict['inputs_complete_dataset'], Group_name_widget.value)
-        #         Data_dict['inputs_complete_dataset'][Variable_name_widget.value] = Data_dict['x'][Variable_name_widget.value]
-                self.Data_dict['z'][Variable_name_widget.value]=self.Data_dict['inputs_complete_dataset'].loc[self.Data_dict['z'].index,Variable_name_widget.value]
-                self.Data_dict['features']=list(OrderedDict.fromkeys(self.Data_dict['features']))
-                self.NewFeatList = self.Data_dict['features']
-                self.NewFeat_datestamp = datetime.datetime.now().time()
+                #Checking for errors caused by invalid user inputs:
+                if Variable_name_widget.value == '':
+                    print(f"New variable's name must not be empty. Type a name for the new variable")
+                #Check for errors in the eval function. If there are errors (e.g. invalid input variables) raise and exception.
+                else:
+                    try:
+                        new_feature(self.Features_color_groups, Equation_widget.value, Variable_name_widget.value, self.Data_dict['features'], self.Data_dict['x'], Group_name_widget.value)    
+                    except:
+                        print(f"Input variable(s) not in dataset. Type an equation using the dataset's variables")
+                    #If there are no errors excecute the code
+                    else:
+                        new_feature(self.Features_color_groups, Equation_widget.value, Variable_name_widget.value, self.Data_dict['features'], self.Data_dict['x'], Group_name_widget.value)
+                        new_feature(self.Features_color_groups, Equation_widget.value, Variable_name_widget.value, self.Data_dict['features'], self.Data_dict['inputs_complete_dataset'], Group_name_widget.value)
+                #         Data_dict['inputs_complete_dataset'][Variable_name_widget.value] = Data_dict['x'][Variable_name_widget.value]
+                        self.Data_dict['z'][Variable_name_widget.value]=self.Data_dict['inputs_complete_dataset'].loc[self.Data_dict['z'].index,Variable_name_widget.value]
+                        self.Data_dict['features']=list(OrderedDict.fromkeys(self.Data_dict['features']))
+                        self.NewFeatList = self.Data_dict['features']
+                        self.NewFeat_datestamp = datetime.datetime.now().time()
+
 
         #Assign the above function to the button click
         Equation_button.on_click(create_feature)
 
         #Define functions and widgets for changing feature and split points at specific nodes
         Node_id_widget=widgets.IntText(value=None, description='Node_id', style = {'description_width': 'initial'}, layout=Layout(width='20%'))
-        
+
         #Create a widget to enable the expert to select, from a dropdown menu of available features, a feature to split 
         Feature_to_Split_widget=widgets.Dropdown(options=self.Data_dict['features'], value=self.Data_dict['features'][0], description='Features', style = {'description_width': 'initial'},
                                                  layout=Layout(width='20%'), disabled=False)
-        
+
         #The list of features in the above dropdown menu will need to be updated in two cases:
         # 1) In case the expert select a set of important features then the list of avail. features should be reduced to that set
         # 2) In case the expert creates a new composite feature then this new feature should be incorporated in the list of available features.
-        
+
         #Create a button to Update the list of available features to choose from:
         Updt_Feat_List_button=widgets.Button(description='Update Features')
         featlist_out=widgets.Output()
@@ -599,10 +689,10 @@ class InteractiveDecisionTreesGUI():
                     Feature_to_Split_widget.options = self.NewFeatList 
                 elif isinstance(self.ImpFeat_datestamp, datetime.time) and isinstance(self.NewFeat_datestamp, datetime.time) and self.ImpFeat_datestamp < self.NewFeat_datestamp:
                     Feature_to_Split_widget.options = self.NewFeatList
-                
+
         #Assign the above function to the button click
         Updt_Feat_List_button.on_click(update_FeaturesList)
-        
+
         #Set the feature to split widget to observe the update button function            
         Feature_to_Split_widget.observe(update_FeaturesList)
         Feature_box_label = widgets.HBox([widgets.Label(value="Creation of New Composite Variables")])
@@ -691,35 +781,88 @@ class InteractiveDecisionTreesGUI():
         def apply_changes(appch):
             Apply_changes_out.clear_output()
             with Apply_changes_out:
-                global counter
-                global base
-                if tree_is_pruned_widget.value == False:
-                    if Refresh_widget_mdf.value == True:
-                        base=modify_nodes()
-                        base.first_modification()
-                        self.counter+=1
-                    elif Refresh_widget_mdf.value == False:
-                        if self.counter==0:
-                            base=modify_nodes()
-                            base.first_modification()
-                            self.counter+=1
-                        elif self.counter>0:
-                            base.modify()  
-                            self.counter+=1
-                elif tree_is_pruned_widget.value == True:
-                    if Refresh_widget_mdf.value == True:
-                        base=modify_nodes(tree_is_pruned = tree_is_pruned_widget.value, Pruned_tree = base_prn.Last_Pruned_tree)
-                        base.first_modification()
-                        self.counter+=1
-                    elif Refresh_widget_mdf.value == False:
-                        if self.counter==0:
+                #Checking for errors caused by invalid user inputs
+                #Invalid max_leaf nodes for left subtree
+                if max_leaf_nodes_left_widget.value <= 1:
+                    print("Maximum leaf nodes in the new left subtree must be greater than 1. A value <= 1 is given. Enter a value > 1.")
+                #Invalid max_leaf nodes for right subtree
+                elif max_leaf_nodes_right_widget.value <= 1:
+                    print("Maximum leaf nodes in the new right subtree must be greater than 1. A value <= 1 is given. Enter a value > 1.")
+                #Invalid split point value
+                elif (Split_point_widget.value > max(self.Data_dict['x'][Feature_to_Split_widget.value]) or Split_point_widget.value < min(self.Data_dict['x'][Feature_to_Split_widget.value])):
+                    print(f"Splitting threshold must be in the range [{min(self.Data_dict['x'][Feature_to_Split_widget.value])}, {max(self.Data_dict['x'][Feature_to_Split_widget.value])}]. A value outside this range is given. Enter a value within the range.")
+                else:
+                    global counter
+                    global base
+                    if tree_is_pruned_widget.value == False:
+                        if Refresh_widget_mdf.value == True:
+                            #Check for invalid split point value
+                            max_val = max(self.Data_dict['x'][Feature_to_Split_widget.value])
+                            min_val = min(self.Data_dict['x'][Feature_to_Split_widget.value])
+                            if (Split_point_widget.value > max_val or Split_point_widget.value < min_val):
+                                print(f"Splitting threshold must be in the range [{min_val}, {max_val}]. A value outside this range is given. Enter a value within the range.")
+                            else:
+                                base=modify_nodes()
+                                base.first_modification()
+                                self.counter+=1
+                        elif Refresh_widget_mdf.value == False:
+                            #Check for invalid split point value
+                            if self.counter==0:
+                                max_val = max(self.Data_dict['x'][Feature_to_Split_widget.value])
+                                min_val = min(self.Data_dict['x'][Feature_to_Split_widget.value])
+                                if (Split_point_widget.value > max_val or Split_point_widget.value < min_val):
+                                    print(f"Splitting threshold must be in the range [{min_val}, {max_val}]. A value outside this range is given. Enter a value within the range.")
+                                else:
+                                    base=modify_nodes()
+                                    base.first_modification()
+                                    self.counter+=1
+                            elif self.counter>0:
+                                #Check for invalid split point value
+                                NodeData = iDT.get_nodes_data(base.Last_modified_tree, self.Data_dict['x'])
+                                min_val = min(NodeData[Node_id_widget.value][Feature_to_Split_widget.value])
+                                max_val = max(NodeData[Node_id_widget.value][Feature_to_Split_widget.value])
+                                if (Split_point_widget.value > max_val or Split_point_widget.value < min_val):
+                                    print(f"Splitting threshold must be in the range [{min_val}, {max_val}]. A value outside this range is given. Enter a value within the range.")
+                                else:
+                                    base.modify()  
+                                    self.counter+=1
+                    elif tree_is_pruned_widget.value == True:
+                        if Refresh_widget_mdf.value == True:
+                            #Check for invalid split point value
+                            NodeData = iDT.get_nodes_data(base_prn.Last_Pruned_tree, self.Data_dict['x'])
+                            min_val = min(NodeData[Node_id_widget.value][Feature_to_Split_widget.value])
+                            max_val = max(NodeData[Node_id_widget.value][Feature_to_Split_widget.value])
                             base=modify_nodes(tree_is_pruned = tree_is_pruned_widget.value, Pruned_tree = base_prn.Last_Pruned_tree)
-                            base.first_modification()
-                            self.counter+=1
-                        elif self.counter>0:
-                            base=modify_nodes(tree_is_pruned = tree_is_pruned_widget.value, Pruned_tree = base_prn.Last_Pruned_tree)
-                            base.modify()  
-                            self.counter+=1
+                            if (Split_point_widget.value > max_val or Split_point_widget.value < min_val):
+                                print(f"Splitting threshold must be in the range [{min_val}, {max_val}]. A value outside this range is given. Enter a value within the range.")
+                            else:
+                                base.first_modification()
+                                self.counter+=1
+                        elif Refresh_widget_mdf.value == False:
+                            if self.counter==0:
+                                #Check for invalid split point value
+                                NodeData = iDT.get_nodes_data(base_prn.Last_Pruned_tree, self.Data_dict['x'])
+                                min_val = min(NodeData[Node_id_widget.value][Feature_to_Split_widget.value])
+                                max_val = max(NodeData[Node_id_widget.value][Feature_to_Split_widget.value])
+                                base=modify_nodes(tree_is_pruned = tree_is_pruned_widget.value, Pruned_tree = base_prn.Last_Pruned_tree)
+                                if (Split_point_widget.value > max_val or Split_point_widget.value < min_val):
+                                    print(f"Splitting threshold must be in the range [{min_val}, {max_val}]. A value outside this range is given. Enter a value within the range.")
+                                else:
+                                    base=modify_nodes(tree_is_pruned = tree_is_pruned_widget.value, Pruned_tree = base_prn.Last_Pruned_tree)
+                                    base.first_modification()
+                                    self.counter+=1
+                            elif self.counter>0:
+                                #Check for invalid split point value
+                                NodeData = iDT.get_nodes_data(base_prn.Last_Pruned_tree, self.Data_dict['x'])
+                                min_val = min(NodeData[Node_id_widget.value][Feature_to_Split_widget.value])
+                                max_val = max(NodeData[Node_id_widget.value][Feature_to_Split_widget.value])
+                                base=modify_nodes(tree_is_pruned = tree_is_pruned_widget.value, Pruned_tree = base_prn.Last_Pruned_tree)
+                                if (Split_point_widget.value > max_val or Split_point_widget.value < min_val):
+                                    print(f"Splitting threshold must be in the range [{min_val}, {max_val}]. A value outside this range is given. Enter a value within the range.")
+                                else:
+                                    base=modify_nodes(tree_is_pruned = tree_is_pruned_widget.value, Pruned_tree = base_prn.Last_Pruned_tree)
+                                    base.modify()  
+                                    self.counter+=1
 
 
 
@@ -749,12 +892,12 @@ class InteractiveDecisionTreesGUI():
         TreeStructure_orig=iDT.TreeStructure(Tree=tree_orig, features=self.Data_dict['features'],  X=self.Data_dict['x'], Y=self.Data_dict['outputs_complete_dataset'],
                                                outputs_train=self.Data_dict['outputs_train'], classes_dict=self.classes_dict)    
 
-               
+
         #We create a class that will contain two methods: 
         #Method first pruning is used to prune the tree plotted in tab Interactive Analysis of Decision Tree and it will store the pruned tree in order to use it then as input to the second method
         #of this class:
         #Method pruning is used for every pruning after the first pruning of the initial tree
-        
+
         class Pruning:
             def __init__(self, nd_id, Tree_to_prune, Data_dict = self.Data_dict, classes_dict = self.classes_dict, Features_color_groups = self.Features_color_groups, modified = False):
                 #The self.Data_dict is the dataset as the user has imported. So we need to pass that as input to this class.
@@ -815,36 +958,101 @@ class InteractiveDecisionTreesGUI():
             with prune_out:
                 global counter_prn
                 global base_prn
+                #Check for invalid user inputs:
                 if Tree_is_modified_widget.value == False:
                     if Refresh_widget.value == True:
                         base_prn=Pruning(node_to_prune_widget.value, TreeStructure_orig, Data_dict = self.Data_dict, classes_dict = self.classes_dict, Features_color_groups = self.Features_color_groups,
-                                         modified = Tree_is_modified_widget.value)
-                        base_prn.first_pruning()
-                        self.counter_prn+=1
+                                             modified = Tree_is_modified_widget.value)
+                        #Check for invalid user inputs
+                        #Node id given greater than total number of nodes
+                        if ((isinstance(base_prn.Tree_to_prune, iDT.TreeStructure) and node_to_prune_widget.value > base_prn.Tree_to_prune.n_nodes) or
+                            (isinstance(base_prn.Tree_to_prune, pd.DataFrame) and node_to_prune_widget.value > len(base_prn.Tree_to_prune.loc[:,:]))):
+                            print("The id of the node to be pruned must not exceed the total number of nodes in the tree. Enter a valid node id")
+                        #Node id given not a leaf node
+                        elif ((isinstance(base_prn.Tree_to_prune, iDT.TreeStructure) and node_to_prune_widget.value in base_prn.Tree_to_prune.leaves) or
+                            (isinstance(base_prn.Tree_to_prune, pd.DataFrame) and node_to_prune_widget.value in list(base_prn.Tree_to_prune.loc[base_prn.Tree_to_prune.loc[:,'nodes_thresholds'] == -2, 'Id']))):
+                            print("The id of the node to be pruned must not be a leaf. An id of a leaf node is given. Enter a test (internal) node id")
+                        else:
+#                             base_prn=Pruning(node_to_prune_widget.value, TreeStructure_orig, Data_dict = self.Data_dict, classes_dict = self.classes_dict, Features_color_groups = self.Features_color_groups,
+#                                              modified = Tree_is_modified_widget.value)
+                            base_prn.first_pruning()
+                            self.counter_prn+=1
                     elif Refresh_widget.value == False:
                         if self.counter_prn==0:
                             base_prn=Pruning(node_to_prune_widget.value, TreeStructure_orig, Data_dict = self.Data_dict, classes_dict = self.classes_dict, 
                                              Features_color_groups = self.Features_color_groups, modified = Tree_is_modified_widget.value)
-                            base_prn.first_pruning()
-                            self.counter_prn+=1
+                            #Check for invalid user inputs
+                            #Node id given greater than total number of nodes
+                            if ((isinstance(base_prn.Tree_to_prune, iDT.TreeStructure) and node_to_prune_widget.value > base_prn.Tree_to_prune.n_nodes) or
+                                (isinstance(base_prn.Tree_to_prune, pd.DataFrame) and node_to_prune_widget.value > len(base_prn.Tree_to_prune.loc[:,:]))):
+                                print("The id of the node to be pruned must not exceed the total number of nodes in the tree. Enter a valid node id")
+                            #Node id given greater than total number of nodes
+                            elif ((isinstance(base_prn.Tree_to_prune, iDT.TreeStructure) and node_to_prune_widget.value in base_prn.Tree_to_prune.leaves) or
+                                  (isinstance(base_prn.Tree_to_prune, pd.DataFrame) and node_to_prune_widget.value in list(base_prn.Tree_to_prune.loc[base_prn.Tree_to_prune.loc[:,'nodes_thresholds'] == -2, 'Id']))):
+                                print("The id of the node to be pruned must not be a leaf. An id of a leaf node is given. Enter a test (internal) node id")
+                            else:
+#                                 base_prn=Pruning(node_to_prune_widget.value, TreeStructure_orig, Data_dict = self.Data_dict, classes_dict = self.classes_dict, 
+#                                                  Features_color_groups = self.Features_color_groups, modified = Tree_is_modified_widget.value)
+                                base_prn.first_pruning()
+                                self.counter_prn+=1
                         elif self.counter_prn>0:
-                            base_prn.pruning(node_to_prune_widget.value)  
-                            self.counter_prn+=1
+                            #Check for invalid user inputs
+                            #Node id given greater than total number of nodes
+                            if ((isinstance(base_prn.Last_Pruned_tree, iDT.TreeStructure) and node_to_prune_widget.value > base_prn.Last_Pruned_tree.n_nodes) or
+                                (isinstance(base_prn.Last_Pruned_tree, pd.DataFrame) and node_to_prune_widget.value > len(base_prn.Last_Pruned_tree.loc[:,:]))):
+                                print("The id of the node to be pruned must not exceed the total number of nodes in the tree. Enter a valid node id")
+                            #Node id given greater than total number of nodes
+                            elif ((isinstance(base_prn.Last_Pruned_tree, iDT.TreeStructure) and node_to_prune_widget.value in base_prn.Last_Pruned_tree.leaves) or
+                                  (isinstance(base_prn.Last_Pruned_tree, pd.DataFrame) and node_to_prune_widget.value in list(base_prn.Last_Pruned_tree.loc[base_prn.Last_Pruned_tree.loc[:,'nodes_thresholds'] == -2, 'Id']))):
+                                print("The id of the node to be pruned must not be a leaf. An id of a leaf node is given. Enter a test (internal) node id")
+                            else:
+                                base_prn.pruning(node_to_prune_widget.value)  
+                                self.counter_prn+=1
                 elif Tree_is_modified_widget.value == True:
                     if Refresh_widget.value == True:
-                        base_prn=Pruning(node_to_prune_widget.value, base.Last_modified_tree, Data_dict = self.Data_dict, classes_dict = self.classes_dict, 
-                                         Features_color_groups = self.Features_color_groups, modified = Tree_is_modified_widget.value)
-                        base_prn.first_pruning()
-                        self.counter_prn+=1
-                    elif Refresh_widget.value == False:
-                        if self.counter_prn==0:
+                        #Check for invalid user inputs
+                        #Node id given greater than total number of nodes
+                        if ((isinstance(base.Last_modified_tree, iDT.TreeStructure) and node_to_prune_widget.value > base.Last_modified_tree.n_nodes) or
+                            (isinstance(base.Last_modified_tree, pd.DataFrame) and node_to_prune_widget.value > len(base.Last_modified_tree.loc[:,:]))):
+                            print("The id of the node to be pruned must not exceed the total number of nodes in the tree. Enter a valid node id")
+                        #Node id given greater than total number of nodes
+                        elif ((isinstance(base.Last_modified_tree, iDT.TreeStructure) and node_to_prune_widget.value in base.Last_modified_tree.leaves) or
+                              (isinstance(base.Last_modified_tree, pd.DataFrame) and node_to_prune_widget.value in list(base.Last_modified_tree.loc[base.Last_modified_tree.loc[:,'nodes_thresholds'] == -2, 'Id']))):
+                            print("The id of the node to be pruned must not be a leaf. An id of a leaf node is given. Enter a test (internal) node id")
+                        else:
                             base_prn=Pruning(node_to_prune_widget.value, base.Last_modified_tree, Data_dict = self.Data_dict, classes_dict = self.classes_dict, 
                                              Features_color_groups = self.Features_color_groups, modified = Tree_is_modified_widget.value)
                             base_prn.first_pruning()
                             self.counter_prn+=1
+                    elif Refresh_widget.value == False:
+                        if self.counter_prn==0:
+                            #Check for invalid user inputs
+                            #Node id given greater than total number of nodes
+                            if ((isinstance(base.Last_modified_tree, iDT.TreeStructure) and node_to_prune_widget.value > base.Last_modified_tree.n_nodes) or
+                                (isinstance(base.Last_modified_tree, pd.DataFrame) and node_to_prune_widget.value > len(base.Last_modified_tree.loc[:,:]))):
+                                print("The id of the node to be pruned must not exceed the total number of nodes in the tree. Enter a valid node id")
+                            #Node id given greater than total number of nodes
+                            elif ((isinstance(base.Last_modified_tree, iDT.TreeStructure) and node_to_prune_widget.value in base.Last_modified_tree.leaves) or
+                                (isinstance(base.Last_modified_tree, pd.DataFrame) and node_to_prune_widget.value in list(base.Last_modified_tree.loc[base.Last_modified_tree.loc[:,'nodes_thresholds'] == -2, 'Id']))):
+                                print("The id of the node to be pruned must not be a leaf. An id of a leaf node is given. Enter a test (internal) node id")
+                            else:
+                                base_prn=Pruning(node_to_prune_widget.value, base.Last_modified_tree, Data_dict = self.Data_dict, classes_dict = self.classes_dict, 
+                                                 Features_color_groups = self.Features_color_groups, modified = Tree_is_modified_widget.value)
+                                base_prn.first_pruning()
+                                self.counter_prn+=1
                         elif self.counter_prn>0:
-                            base_prn.pruning(node_to_prune_widget.value, base.Last_modified_tree)  
-                            self.counter_prn+=1
+                            #Check for invalid user inputs
+                            #Node id given greater than total number of nodes
+                            if ((isinstance(base.Last_modified_tree, iDT.TreeStructure) and node_to_prune_widget.value > base.Last_modified_tree.n_nodes) or
+                                (isinstance(base.Last_modified_tree, pd.DataFrame) and node_to_prune_widget.value > len(base.Last_modified_tree.loc[:,:]))):
+                                print("The id of the node to be pruned must not exceed the total number of nodes in the tree. Enter a valid node id")
+                            #Node id given greater than total number of nodes
+                            elif ((isinstance(base.Last_modified_tree, iDT.TreeStructure) and node_to_prune_widget.value in base.Last_modified_tree.leaves) or
+                                (isinstance(base.Last_modified_tree, pd.DataFrame) and node_to_prune_widget.value in list(base.Last_modified_tree.loc[base.Last_modified_tree.loc[:,'nodes_thresholds'] == -2, 'Id']))):
+                                print("The id of the node to be pruned must not be a leaf. An id of a leaf node is given. Enter a test (internal) node id")
+                            else:
+                                base_prn.pruning(node_to_prune_widget.value, base.Last_modified_tree)  
+                                self.counter_prn+=1
 
         #Assign the above function to prune button click
         Prune_button.on_click(Prune)        
@@ -868,35 +1076,34 @@ class InteractiveDecisionTreesGUI():
 
         def change_leaf_node_class(chg_cl):
             change_leaf_node_class_out.clear_output()
-            with change_leaf_node_class_out:
+            with change_leaf_node_class_out: 
                 if self.counter == 0 and self.counter_prn == 0:
                     global base
                     base = modify_nodes()
-                    iDT.change_class(leaf_node_id_widget.value, base.Tree_to_modify_str, new_class_widget.value)
-                    iDT.Plot_Tree(base.Tree_to_modify_str, self.classes_dict, criterion=inter_3.widget.kwargs['criterion'], Best_first_Tree_Builder=True, 
-                                    nodes_coloring=inter_3.widget.kwargs['nodes_coloring'], edges_shape=inter_3.widget.kwargs['edges_shape'], 
-                                    User_features_color_groups=None if inter_3.widget.kwargs['nodes_coloring'] != 'Features_color_groups' else self.Features_color_groups,
-                                    plot_width=inter_3.widget.kwargs['plot_width'], plot_height=inter_3.widget.kwargs['plot_height'], 
-                                    mrk_size=inter_3.widget.kwargs['mrk_size'], txt_size=inter_3.widget.kwargs['txt_size'], 
-                                    opacity_edges=inter_3.widget.kwargs['opacity_edges'], opacity_nodes=inter_3.widget.kwargs['opacity_nodes'], show_figure=True)
-                elif self.counter != 0 and self.counter_prn == 0:
-                    iDT.change_class(leaf_node_id_widget.value, base.Last_modified_tree, new_class_widget.value)
-                    iDT.Plot_Tree(base.Last_modified_tree, self.classes_dict, criterion=inter_3.widget.kwargs['criterion'], Best_first_Tree_Builder=True,
-                                    nodes_coloring=inter_3.widget.kwargs['nodes_coloring'], edges_shape=inter_3.widget.kwargs['edges_shape'], 
-                                    User_features_color_groups=None if inter_3.widget.kwargs['nodes_coloring'] != 'Features_color_groups' else self.Features_color_groups,
-                                    plot_width=inter_3.widget.kwargs['plot_width'], plot_height=inter_3.widget.kwargs['plot_height'], 
-                                    mrk_size=inter_3.widget.kwargs['mrk_size'], txt_size=inter_3.widget.kwargs['txt_size'], 
-                                    opacity_edges=inter_3.widget.kwargs['opacity_edges'], opacity_nodes=inter_3.widget.kwargs['opacity_nodes'], show_figure=True)
-                elif self.counter != 0 and self.counter_prn != 0:
-                    if Last_tree_interaction_widget.value == 'Last pruned':
-                        iDT.change_class(leaf_node_id_widget.value, base_prn.Last_Pruned_tree, new_class_widget.value)
-                        iDT.Plot_Tree(base_prn.Last_Pruned_tree, self.classes_dict, criterion=inter_3.widget.kwargs['criterion'], Best_first_Tree_Builder=True,
+                    #Check for invalid user inputs
+                    #Node id given is not a leaf
+                    if (isinstance(base.Tree_to_modify_str, iDT.TreeStructure) and base.Tree_to_modify_str.feature_labels[leaf_node_id_widget.value] != 'leaf_node' or
+                        isinstance(base.Tree_to_modify_str, pd.DataFrame) and base.Tree_to_modify_str.loc[leaf_node_id_widget.value,'nodes_labels'] != 'leaf_node'):
+                        print("The node id must be a leaf node. A test node id is given. Enter a leaf node id")
+                    elif(new_class_widget.value not in self.classes_dict['Classes Labels']):
+#                     elif (isinstance(base.Tree_to_modify_str, iDT.TreeStructure) and new_class_widget.value not in base.Tree_to_modify_str.Node_classes or
+#                           isinstance(base.Tree_to_modify_str, pd.DataFrame) and new_class_widget.value not in list(base.Tree_to_modify_str.loc[leaf_node_id_widget.value,'nodes_classes'])):
+                        print("The new class does not exist in the dataset. Define the new class using the corresponding tool in the preprocessing stage tab")
+                    else:
+                        iDT.change_class(leaf_node_id_widget.value, base.Tree_to_modify_str, new_class_widget.value)
+                        iDT.Plot_Tree(base.Tree_to_modify_str, self.classes_dict, criterion=inter_3.widget.kwargs['criterion'], Best_first_Tree_Builder=True, 
                                         nodes_coloring=inter_3.widget.kwargs['nodes_coloring'], edges_shape=inter_3.widget.kwargs['edges_shape'], 
                                         User_features_color_groups=None if inter_3.widget.kwargs['nodes_coloring'] != 'Features_color_groups' else self.Features_color_groups,
-                                        plot_width=inter_3.widget.kwargs['plot_width'], plot_height=inter_3.widget.kwargs['plot_height'],
+                                        plot_width=inter_3.widget.kwargs['plot_width'], plot_height=inter_3.widget.kwargs['plot_height'], 
                                         mrk_size=inter_3.widget.kwargs['mrk_size'], txt_size=inter_3.widget.kwargs['txt_size'], 
                                         opacity_edges=inter_3.widget.kwargs['opacity_edges'], opacity_nodes=inter_3.widget.kwargs['opacity_nodes'], show_figure=True)
-                    elif Last_tree_interaction_widget.value == 'Last modified':
+                elif self.counter != 0 and self.counter_prn == 0:
+                    if (isinstance(base.Last_modified_tree, iDT.TreeStructure) and base.Last_modified_tree.feature_labels[leaf_node_id_widget.value] != 'leaf_node' or
+                        isinstance(base.Last_modified_tree, pd.DataFrame) and base.Last_modified_tree.loc[leaf_node_id_widget.value,'nodes_labels'] != 'leaf_node'):
+                        print("The node id must be a leaf node. A test node id is given. Enter a leaf node id")
+                    elif(new_class_widget.value not in self.classes_dict['Classes Labels']):
+                        print("The new class does not exist in the dataset. Define the new class using the corresponding tool in the preprocessing stage tab.")
+                    else:
                         iDT.change_class(leaf_node_id_widget.value, base.Last_modified_tree, new_class_widget.value)
                         iDT.Plot_Tree(base.Last_modified_tree, self.classes_dict, criterion=inter_3.widget.kwargs['criterion'], Best_first_Tree_Builder=True,
                                         nodes_coloring=inter_3.widget.kwargs['nodes_coloring'], edges_shape=inter_3.widget.kwargs['edges_shape'], 
@@ -904,15 +1111,50 @@ class InteractiveDecisionTreesGUI():
                                         plot_width=inter_3.widget.kwargs['plot_width'], plot_height=inter_3.widget.kwargs['plot_height'], 
                                         mrk_size=inter_3.widget.kwargs['mrk_size'], txt_size=inter_3.widget.kwargs['txt_size'], 
                                         opacity_edges=inter_3.widget.kwargs['opacity_edges'], opacity_nodes=inter_3.widget.kwargs['opacity_nodes'], show_figure=True)
+                elif self.counter != 0 and self.counter_prn != 0:
+                    if Last_tree_interaction_widget.value == 'Last pruned':
+                        if (isinstance(base_prn.Last_Pruned_tree, iDT.TreeStructure) and base_prn.Last_Pruned_tree.feature_labels[leaf_node_id_widget.value] != 'leaf_node' or
+                            isinstance(base_prn.Last_Pruned_tree, pd.DataFrame) and base_prn.Last_Pruned_tree.loc[leaf_node_id_widget.value,'nodes_labels'] != 'leaf_node'):
+                            print("The node id must be a leaf node. A test node id is given. Enter a leaf node id")
+                        elif (new_class_widget.value not in self.classes_dict['Classes Labels']):
+                            print("The new class does not exist in the dataset. Define the new class using the corresponding tool in the preprocessing stage tab")
+                        else:
+                            iDT.change_class(leaf_node_id_widget.value, base_prn.Last_Pruned_tree, new_class_widget.value)
+                            iDT.Plot_Tree(base_prn.Last_Pruned_tree, self.classes_dict, criterion=inter_3.widget.kwargs['criterion'], Best_first_Tree_Builder=True,
+                                            nodes_coloring=inter_3.widget.kwargs['nodes_coloring'], edges_shape=inter_3.widget.kwargs['edges_shape'], 
+                                            User_features_color_groups=None if inter_3.widget.kwargs['nodes_coloring'] != 'Features_color_groups' else self.Features_color_groups,
+                                            plot_width=inter_3.widget.kwargs['plot_width'], plot_height=inter_3.widget.kwargs['plot_height'],
+                                            mrk_size=inter_3.widget.kwargs['mrk_size'], txt_size=inter_3.widget.kwargs['txt_size'], 
+                                            opacity_edges=inter_3.widget.kwargs['opacity_edges'], opacity_nodes=inter_3.widget.kwargs['opacity_nodes'], show_figure=True)
+                    elif Last_tree_interaction_widget.value == 'Last modified':
+                        if (isinstance(base.Last_modified_tree, iDT.TreeStructure) and base.Last_modified_tree.feature_labels[leaf_node_id_widget.value] != 'leaf_node' or
+                            isinstance(base.Last_modified_tree, pd.DataFrame) and base.Last_modified_tree.loc[leaf_node_id_widget.value,'nodes_labels'] != 'leaf_node'):
+                            print("The node id must be a leaf node. A test node id is given. Enter a leaf node id")
+                        elif(new_class_widget.value not in self.classes_dict['Classes Labels']):
+                            print("The new class does not exist in the dataset. Define the new class using the corresponding tool in the preprocessing stage tab")
+                        else:
+                            iDT.change_class(leaf_node_id_widget.value, base.Last_modified_tree, new_class_widget.value)
+                            iDT.Plot_Tree(base.Last_modified_tree, self.classes_dict, criterion=inter_3.widget.kwargs['criterion'], Best_first_Tree_Builder=True,
+                                            nodes_coloring=inter_3.widget.kwargs['nodes_coloring'], edges_shape=inter_3.widget.kwargs['edges_shape'], 
+                                            User_features_color_groups=None if inter_3.widget.kwargs['nodes_coloring'] != 'Features_color_groups' else self.Features_color_groups,
+                                            plot_width=inter_3.widget.kwargs['plot_width'], plot_height=inter_3.widget.kwargs['plot_height'], 
+                                            mrk_size=inter_3.widget.kwargs['mrk_size'], txt_size=inter_3.widget.kwargs['txt_size'], 
+                                            opacity_edges=inter_3.widget.kwargs['opacity_edges'], opacity_nodes=inter_3.widget.kwargs['opacity_nodes'], show_figure=True)
                 elif self.counter == 0 and self.counter_prn != 0:
-                    iDT.change_class(leaf_node_id_widget.value, base_prn.Last_Pruned_tree, new_class_widget.value)
-                    iDT.Plot_Tree(base_prn.Last_Pruned_tree, self.classes_dict, criterion=inter_3.widget.kwargs['criterion'], Best_first_Tree_Builder=True, 
-                                    nodes_coloring=inter_3.widget.kwargs['nodes_coloring'], 
-                                    edges_shape=inter_3.widget.kwargs['edges_shape'], 
-                                    User_features_color_groups=None if inter_3.widget.kwargs['nodes_coloring'] != 'Features_color_groups' else self.Features_color_groups,
-                                    plot_width=inter_3.widget.kwargs['plot_width'], plot_height=inter_3.widget.kwargs['plot_height'], 
-                                    mrk_size=inter_3.widget.kwargs['mrk_size'], txt_size=inter_3.widget.kwargs['txt_size'], 
-                                    opacity_edges=inter_3.widget.kwargs['opacity_edges'], opacity_nodes=inter_3.widget.kwargs['opacity_nodes'], show_figure=True)
+                    if (isinstance(base_prn.Last_Pruned_tree, iDT.TreeStructure) and base_prn.Last_Pruned_tree.feature_labels[leaf_node_id_widget.value] != 'leaf_node' or
+                        isinstance(base_prn.Last_Pruned_tree, pd.DataFrame) and base_prn.Last_Pruned_tree.loc[leaf_node_id_widget.value,'nodes_labels'] != 'leaf_node'):
+                        print("The node id must be a leaf node. A test node id is given. Enter a leaf node id")
+                    elif(new_class_widget.value not in self.classes_dict['Classes Labels']):  
+                        print("The new class does not exist in the dataset. Define the new class using the corresponding tool in the preprocessing stage tab")
+                    else:
+                        iDT.change_class(leaf_node_id_widget.value, base_prn.Last_Pruned_tree, new_class_widget.value)
+                        iDT.Plot_Tree(base_prn.Last_Pruned_tree, self.classes_dict, criterion=inter_3.widget.kwargs['criterion'], Best_first_Tree_Builder=True, 
+                                        nodes_coloring=inter_3.widget.kwargs['nodes_coloring'], 
+                                        edges_shape=inter_3.widget.kwargs['edges_shape'], 
+                                        User_features_color_groups=None if inter_3.widget.kwargs['nodes_coloring'] != 'Features_color_groups' else self.Features_color_groups,
+                                        plot_width=inter_3.widget.kwargs['plot_width'], plot_height=inter_3.widget.kwargs['plot_height'], 
+                                        mrk_size=inter_3.widget.kwargs['mrk_size'], txt_size=inter_3.widget.kwargs['txt_size'], 
+                                        opacity_edges=inter_3.widget.kwargs['opacity_edges'], opacity_nodes=inter_3.widget.kwargs['opacity_nodes'], show_figure=True)
 
         #Assign the above function to prune button click
         Change_class_button.on_click(change_leaf_node_class)        
@@ -922,7 +1164,7 @@ class InteractiveDecisionTreesGUI():
         Changing_class_widgs = widgets.VBox([Changing_class_inputs_box, change_leaf_node_class_out], box_style='info')
         Changing_class_box = widgets.VBox([Changing_class_label, Changing_class_widgs])
         Changing_class_box.layout.border = "1px solid"
-        
+
         #Assign all the widgets with their functionalities into a box
         self.Box=widgets.VBox([Feature_box, controls, Specify_feature_split_point_Box, inter_output, Apply_changes_out, Pruning_box, Changing_class_box], box_style='info')
     
@@ -1133,26 +1375,65 @@ class InteractiveDecisionTreesGUI():
         def output_DT_and_Data(outdtdt):
             Output_tree_out.clear_output()
             with Output_tree_out:
-                if Tree_state_widget.value == 'No expert tree interactions':
-                    tree_orig=tree.DecisionTreeClassifier(criterion=inter_3.widget.kwargs['criterion'], splitter=inter_3.widget.kwargs['splitter'], max_depth=inter_3.widget.kwargs['max_depth'],
-                                                          min_samples_split=inter_3.widget.kwargs['min_samples_split'], min_samples_leaf=inter_3.widget.kwargs['min_samples_leaf'],
-                                                          min_weight_fraction_leaf=0.0, max_features=inter_3.widget.kwargs['max_features'], random_state=inter_3.widget.kwargs['random_state'],
-                                                          max_leaf_nodes=inter_3.widget.kwargs['max_leaf_nodes'], min_impurity_decrease=inter_3.widget.kwargs['min_impurity_decrease'],
-                                                          min_impurity_split=None, class_weight=None,ccp_alpha=0.0) 
-                    tree_orig.fit(self.Data_dict['x'],self.Data_dict['y'])
-                    TreeStructureBase_orig=iDT.TreeStructure(Tree=tree_orig, features=self.Data_dict['features'],  X=self.Data_dict['x'], Y=self.Data_dict['outputs_complete_dataset'], 
-                                                               classes_dict=self.classes_dict, outputs_train=self.Data_dict['outputs_train'])
-                    if self.Train_test_splitting.value == True:
-                        self.DT = TreeStructureBase_orig.IDs_Depths
+                #Check for invalid user input name:
+                if outputfilename_widget.value == '':
+                    print("Filename must not be empty. An empty string is given. Type a name.")
+                else:
+                    if Tree_state_widget.value == 'No expert tree interactions':
+                        tree_orig=tree.DecisionTreeClassifier(criterion=inter_3.widget.kwargs['criterion'], splitter=inter_3.widget.kwargs['splitter'], max_depth=inter_3.widget.kwargs['max_depth'],
+                                                              min_samples_split=inter_3.widget.kwargs['min_samples_split'], min_samples_leaf=inter_3.widget.kwargs['min_samples_leaf'],
+                                                              min_weight_fraction_leaf=0.0, max_features=inter_3.widget.kwargs['max_features'], random_state=inter_3.widget.kwargs['random_state'],
+                                                              max_leaf_nodes=inter_3.widget.kwargs['max_leaf_nodes'], min_impurity_decrease=inter_3.widget.kwargs['min_impurity_decrease'],
+                                                              min_impurity_split=None, class_weight=None,ccp_alpha=0.0) 
+                        tree_orig.fit(self.Data_dict['x'],self.Data_dict['y'])
+                        TreeStructureBase_orig=iDT.TreeStructure(Tree=tree_orig, features=self.Data_dict['features'],  X=self.Data_dict['x'], Y=self.Data_dict['outputs_complete_dataset'], 
+                                                                   classes_dict=self.classes_dict, outputs_train=self.Data_dict['outputs_train'])
+                        if self.Train_test_splitting.value == True:
+                            self.DT = TreeStructureBase_orig.IDs_Depths
+                            if file_format_widget.value == 'pickle':
+                                #Output DT
+                                self.DT.to_pickle(outputfilename_widget.value)
+                                #Output the data
+                                self.Data_dict['x'].to_pickle('Training_input_{}'.format(outputfilename_widget.value)) 
+                                self.Data_dict['y'].to_pickle('Training_classes_{}'.format(outputfilename_widget.value))
+                                self.Data_dict['z'].to_pickle('Test_input_{}'.format(outputfilename_widget.value))
+                                self.Data_dict['w'].to_pickle('Test_classes_{}'.format(outputfilename_widget.value))
+                                self.Accuracies.to_pickle('Accuracies_{}'.format(outputfilename_widget.value))
+                            elif file_format_widget.value == 'csv':
+                                #Output DT
+                                self.DT.to_csv(outputfilename_widget.value)
+                                #Output the data
+                                self.Data_dict['x'].to_csv('Training_input_{}.csv'.format(outputfilename_widget.value)) 
+                                self.Data_dict['y'].to_csv('Training_classes_{}.csv'.format(outputfilename_widget.value))
+                                self.Data_dict['z'].to_csv('Test_input_{}.csv'.format(outputfilename_widget.value))
+                                self.Data_dict['w'].to_csv('Test_classes_{}.csv'.format(outputfilename_widget.value))
+                                self.Accuracies.to_csv('Accuracies_{}.csv'.format(outputfilename_widget.value))
+                        elif self.Train_test_splitting.value == False:
+                            if file_format_widget.value == 'pickle':
+                                #Output DT
+                                self.DT.to_pickle(outputfilename_widget.value)
+                                #Output the data
+                                self.Data_dict['x'].to_pickle('Training_input_{}'.format(outputfilename_widget.value)) 
+                                self.Data_dict['y'].to_pickle('Training_classes_{}'.format(outputfilename_widget.value))
+                                self.Accuracies.to_pickle('Accuracies_{}'.format(outputfilename_widget.value))
+                            elif file_format_widget.value == 'csv':
+                                #Output DT
+                                self.DT.to_csv(outputfilename_widget.value)
+                                #Output the data
+                                self.Data_dict['x'].to_csv('Training_input_{}.csv'.format(outputfilename_widget.value)) 
+                                self.Data_dict['y'].to_csv('Training_classes_{}.csv'.format(outputfilename_widget.value))
+                                self.Accuracies.to_csv('Accuracies_{}.csv'.format(outputfilename_widget.value))
+                    if Tree_state_widget.value == 'Tree was last modified':
+                        self.DT = base.Last_modified_tree
                         if file_format_widget.value == 'pickle':
-                            #Output DT
-                            self.DT.to_pickle(outputfilename_widget.value)
-                            #Output the data
-                            self.Data_dict['x'].to_pickle('Training_input_{}'.format(outputfilename_widget.value)) 
-                            self.Data_dict['y'].to_pickle('Training_classes_{}'.format(outputfilename_widget.value))
-                            self.Data_dict['z'].to_pickle('Test_input_{}'.format(outputfilename_widget.value))
-                            self.Data_dict['w'].to_pickle('Test_classes_{}'.format(outputfilename_widget.value))
-                            self.Accuracies.to_pickle('Accuracies_{}'.format(outputfilename_widget.value))
+                                #Output DT
+                                self.DT.to_pickle(outputfilename_widget.value)
+                                #Output the data
+                                self.Data_dict['x'].to_pickle('Training_input_{}'.format(outputfilename_widget.value)) 
+                                self.Data_dict['y'].to_pickle('Training_classes_{}'.format(outputfilename_widget.value))
+                                self.Data_dict['z'].to_pickle('Test_input_{}'.format(outputfilename_widget.value))
+                                self.Data_dict['w'].to_pickle('Test_classes_{}'.format(outputfilename_widget.value))
+                                self.Accuracies.to_pickle('Accuracies_{}'.format(outputfilename_widget.value))
                         elif file_format_widget.value == 'csv':
                             #Output DT
                             self.DT.to_csv(outputfilename_widget.value)
@@ -1177,76 +1458,41 @@ class InteractiveDecisionTreesGUI():
                             self.Data_dict['x'].to_csv('Training_input_{}.csv'.format(outputfilename_widget.value)) 
                             self.Data_dict['y'].to_csv('Training_classes_{}.csv'.format(outputfilename_widget.value))
                             self.Accuracies.to_csv('Accuracies_{}.csv'.format(outputfilename_widget.value))
-                if Tree_state_widget.value == 'Tree was last modified':
-                    self.DT = base.Last_modified_tree
-                    if file_format_widget.value == 'pickle':
+                    if Tree_state_widget.value == 'Tree was last pruned':
+                        self.DT = base_prn.Last_Pruned_tree
+                        if file_format_widget.value == 'pickle':
+                                #Output DT
+                                self.DT.to_pickle(outputfilename_widget.value)
+                                #Output the data
+                                self.Data_dict['x'].to_pickle('Training_input_{}'.format(outputfilename_widget.value)) 
+                                self.Data_dict['y'].to_pickle('Training_classes_{}'.format(outputfilename_widget.value))
+                                self.Data_dict['z'].to_pickle('Test_input_{}'.format(outputfilename_widget.value))
+                                self.Data_dict['w'].to_pickle('Test_classes_{}'.format(outputfilename_widget.value))
+                                self.Accuracies.to_pickle('Accuracies_{}'.format(outputfilename_widget.value))
+                        elif file_format_widget.value == 'csv':
+                            #Output DT
+                            self.DT.to_csv(outputfilename_widget.value)
+                            #Output the data
+                            self.Data_dict['x'].to_csv('Training_input_{}.csv'.format(outputfilename_widget.value)) 
+                            self.Data_dict['y'].to_csv('Training_classes_{}.csv'.format(outputfilename_widget.value))
+                            self.Data_dict['z'].to_csv('Test_input_{}.csv'.format(outputfilename_widget.value))
+                            self.Data_dict['w'].to_csv('Test_classes_{}.csv'.format(outputfilename_widget.value))
+                            self.Accuracies.to_csv('Accuracies_{}.csv'.format(outputfilename_widget.value))
+                    elif self.Train_test_splitting.value == False:
+                        if file_format_widget.value == 'pickle':
                             #Output DT
                             self.DT.to_pickle(outputfilename_widget.value)
                             #Output the data
                             self.Data_dict['x'].to_pickle('Training_input_{}'.format(outputfilename_widget.value)) 
                             self.Data_dict['y'].to_pickle('Training_classes_{}'.format(outputfilename_widget.value))
-                            self.Data_dict['z'].to_pickle('Test_input_{}'.format(outputfilename_widget.value))
-                            self.Data_dict['w'].to_pickle('Test_classes_{}'.format(outputfilename_widget.value))
                             self.Accuracies.to_pickle('Accuracies_{}'.format(outputfilename_widget.value))
-                    elif file_format_widget.value == 'csv':
-                        #Output DT
-                        self.DT.to_csv(outputfilename_widget.value)
-                        #Output the data
-                        self.Data_dict['x'].to_csv('Training_input_{}.csv'.format(outputfilename_widget.value)) 
-                        self.Data_dict['y'].to_csv('Training_classes_{}.csv'.format(outputfilename_widget.value))
-                        self.Data_dict['z'].to_csv('Test_input_{}.csv'.format(outputfilename_widget.value))
-                        self.Data_dict['w'].to_csv('Test_classes_{}.csv'.format(outputfilename_widget.value))
-                        self.Accuracies.to_csv('Accuracies_{}.csv'.format(outputfilename_widget.value))
-                elif self.Train_test_splitting.value == False:
-                    if file_format_widget.value == 'pickle':
-                        #Output DT
-                        self.DT.to_pickle(outputfilename_widget.value)
-                        #Output the data
-                        self.Data_dict['x'].to_pickle('Training_input_{}'.format(outputfilename_widget.value)) 
-                        self.Data_dict['y'].to_pickle('Training_classes_{}'.format(outputfilename_widget.value))
-                        self.Accuracies.to_pickle('Accuracies_{}'.format(outputfilename_widget.value))
-                    elif file_format_widget.value == 'csv':
-                        #Output DT
-                        self.DT.to_csv(outputfilename_widget.value)
-                        #Output the data
-                        self.Data_dict['x'].to_csv('Training_input_{}.csv'.format(outputfilename_widget.value)) 
-                        self.Data_dict['y'].to_csv('Training_classes_{}.csv'.format(outputfilename_widget.value))
-                        self.Accuracies.to_csv('Accuracies_{}.csv'.format(outputfilename_widget.value))
-                if Tree_state_widget.value == 'Tree was last pruned':
-                    self.DT = base_prn.Last_Pruned_tree
-                    if file_format_widget.value == 'pickle':
+                        elif file_format_widget.value == 'csv':
                             #Output DT
-                            self.DT.to_pickle(outputfilename_widget.value)
+                            self.DT.to_csv(outputfilename_widget.value)
                             #Output the data
-                            self.Data_dict['x'].to_pickle('Training_input_{}'.format(outputfilename_widget.value)) 
-                            self.Data_dict['y'].to_pickle('Training_classes_{}'.format(outputfilename_widget.value))
-                            self.Data_dict['z'].to_pickle('Test_input_{}'.format(outputfilename_widget.value))
-                            self.Data_dict['w'].to_pickle('Test_classes_{}'.format(outputfilename_widget.value))
-                            self.Accuracies.to_pickle('Accuracies_{}'.format(outputfilename_widget.value))
-                    elif file_format_widget.value == 'csv':
-                        #Output DT
-                        self.DT.to_csv(outputfilename_widget.value)
-                        #Output the data
-                        self.Data_dict['x'].to_csv('Training_input_{}.csv'.format(outputfilename_widget.value)) 
-                        self.Data_dict['y'].to_csv('Training_classes_{}.csv'.format(outputfilename_widget.value))
-                        self.Data_dict['z'].to_csv('Test_input_{}.csv'.format(outputfilename_widget.value))
-                        self.Data_dict['w'].to_csv('Test_classes_{}.csv'.format(outputfilename_widget.value))
-                        self.Accuracies.to_csv('Accuracies_{}.csv'.format(outputfilename_widget.value))
-                elif self.Train_test_splitting.value == False:
-                    if file_format_widget.value == 'pickle':
-                        #Output DT
-                        self.DT.to_pickle(outputfilename_widget.value)
-                        #Output the data
-                        self.Data_dict['x'].to_pickle('Training_input_{}'.format(outputfilename_widget.value)) 
-                        self.Data_dict['y'].to_pickle('Training_classes_{}'.format(outputfilename_widget.value))
-                        self.Accuracies.to_pickle('Accuracies_{}'.format(outputfilename_widget.value))
-                    elif file_format_widget.value == 'csv':
-                        #Output DT
-                        self.DT.to_csv(outputfilename_widget.value)
-                        #Output the data
-                        self.Data_dict['x'].to_csv('Training_input_{}.csv'.format(outputfilename_widget.value)) 
-                        self.Data_dict['y'].to_csv('Training_classes_{}.csv'.format(outputfilename_widget.value))
-                        self.Accuracies.to_csv('Accuracies_{}.csv'.format(outputfilename_widget.value))
+                            self.Data_dict['x'].to_csv('Training_input_{}.csv'.format(outputfilename_widget.value)) 
+                            self.Data_dict['y'].to_csv('Training_classes_{}.csv'.format(outputfilename_widget.value))
+                            self.Accuracies.to_csv('Accuracies_{}.csv'.format(outputfilename_widget.value))
                         
         #Assign the above function to calculate accuracy button click
         Output_tree_button.on_click(output_DT_and_Data)            
