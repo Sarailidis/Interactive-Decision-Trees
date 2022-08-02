@@ -1593,7 +1593,7 @@ class Data_Preprocessing:
         
         if isinstance(filename, str):
             #Import the whole dataset
-            data_table=pd.read_csv(filename, header=header, index_col=index_col, sep =',')
+            data_table=pd.read_csv(filename, header=None if header==-1 else header, index_col=None if index_col==-1 else index_col, sep =',')
         elif isinstance(filename, pd.DataFrame):
             data_table=filename
 

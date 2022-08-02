@@ -94,7 +94,7 @@ def import_file(filename, sample_size=None, random_sampling=False, header=None, 
     
     '''
     if random_sampling == False:
-        dataset_df=iDT.Data_Preprocessing.Data_Preparation(filename=filename, header=header, index_col=index_col, sep = sep, train_test_splitting=train_test_splitting, 
+        dataset_df=iDT.Data_Preprocessing.Data_Preparation(filename=filename, header=None if header==-1 else header, index_col=None if index_col==-1 else index_col, sep = sep, train_test_splitting=train_test_splitting, 
                                                              test_size=test_size, random_state=random_state)
         
     elif random_sampling == True:
@@ -106,10 +106,13 @@ def import_file(filename, sample_size=None, random_sampling=False, header=None, 
             print('Dataset not loaded! \nSample size must not be larger than the population.')
             dataset_df = pd.DataFrame()
         else:
-            skip = sorted(random.sample(range(1,n+1),n-s)) #the 0-indexed header will not be included in the skip list
-            dataset_sample = pd.read_csv(filename, skiprows=skip, index_col=index_col) #pandas.read_csv(filename, skiprows=skip)
+            skip = sorted(random.sample(range(1,n),n-s)) #the 0-indexed header will not be included in the skip list #sorted(random.sample(range(1,n+1),n-s))
+            for i in [0,1]:
+                if i in skip:
+                    skip.remove(i)
+            dataset_sample = pd.read_csv(filename, skiprows=skip,  header=None if header==-1 else header, index_col=None if index_col==-1 else index_col) #pd.read_csv(filename, skiprows=skip, index_col=index_col)
 
-            dataset_df=iDT.Data_Preprocessing.Data_Preparation(filename=dataset_sample, header=header, index_col=index_col, train_test_splitting=train_test_splitting, 
+            dataset_df=iDT.Data_Preprocessing.Data_Preparation(filename=dataset_sample, header=None if header==-1 else header, index_col=None if index_col==-1 else index_col, train_test_splitting=train_test_splitting, 
                                                                  test_size=test_size, random_state=random_state)
     
     return dataset_df
@@ -269,7 +272,7 @@ class InteractiveDecisionTreesGUI():
         if max_features>maximum_features:
             print(f"Max_features must not exceed the maximum number of available features in the dataset {maximum_features}. A value > {maximum_features} is given. Enter a value <= {maximum_features}.") 
         elif max_features<=0:
-            print(f"Max_features must be greater than 0. A value <= 0 is given. Enter a value > 0.")  # Alternatively if I want to show an error message: raise ValueError(f"Max_features must be greater than 0") from None
+            print(f"Max_features must be greater than 0. A value <= 0 is given. Enter a value > 0.")
         elif min_samples_leaf<1:
             print(f"Min_samples_leaf must be greater than or equal to 1. A value < 1 is given. Enter a value >= 1")
         elif min_samples_split<=1:
@@ -333,28 +336,26 @@ class InteractiveDecisionTreesGUI():
                     #Invalind sample size
                     #User input a sample size equal or less than zero.
                     if (Random_sampling_widget.value == True and Sample_size_widget.value <=0):
-                        print('Dataset not loaded! \nWhen Random Sampling is enabled, sample size must be greater than zero. A value <= 0 is given. Enter a value > 0.')
+                        print('Dataset not loaded! \nWhen Random Sampling is enabled, sample size must be greater than 1. A value <= 1 is given. Enter a value > 1.')
+                    elif (Random_sampling_widget.value == True and Sample_size_widget.value<=1):
+                        print(f"Dataset not loaded! \nWhen Random Sampling is enabled, sample size must be greater than 1. A value <= 1 is given. Enter a value > 1.")
                     elif (Random_sampling_widget.value == True and Sample_size_widget.value>=n):
-                        print(f"Dataset not loaded! \nSample size must not be larger than the population {n}. A value >= {n} is given. Enter a value < {n}")
+                        print(f"Dataset not loaded! \nSample size must not be larger than the population {n}. A value >= {n} is given. Enter a value < {n}") 
                     #Invalid test size
                     else:
                         if (self.Train_test_splitting.value == True and Random_sampling_widget.value == True and test_size_widget.value <= 0):
-                            print(f"Dataset not loaded! Test size dataset must be in the range [0,1] or positive, integer smaller than the sample size {Sample_size_widget.value}. Enter any value within [0,1] or an integer within [0, {Sample_size_widget.value}]")
+                            print(f"Dataset not loaded! Test size dataset must be in the range [0,1]. Enter any value within [0,1].")
                         elif (self.Train_test_splitting.value == True and Random_sampling_widget.value == False and test_size_widget.value <= 0):
-                            print(f"Dataset not loaded! Test size dataset must be in the range [0,1] or positive, integer smaller than the population {n}. Enter any value within [0,1] or an integer within [0, {n}].")
-                        elif (self.Train_test_splitting.value == True and Random_sampling_widget.value == True and test_size_widget.value > Sample_size_widget.value):
-                            print(f"Dataset not loaded! Test size dataset must be in the range [0,1] or positive, integer smaller than the sample size {Sample_size_widget.value}. Enter any value within [0,1] or an integer within [0, {Sample_size_widget.value}]")
-                        elif (self.Train_test_splitting.value == True and Random_sampling_widget.value == False and test_size_widget.value > n):
-                            print(f"Dataset not loaded! Test size dataset must be in the range [0,1] or positive, integer than the population {n}. Enter any value within [0,1] or an integer within [0, {n}].")
-                        elif (self.Train_test_splitting.value == True and Random_sampling_widget.value == True and test_size_widget.value > 1 and type(test_size_widget.value) == float):
-                            print(f"Dataset not loaded! Test size dataset must be in the range [0,1] or positive, integer smaller than the population {n}. Enter any value within [0,1] or an integer within [0, {Sample_size_widget.value}]")
-                        elif (self.Train_test_splitting.value == True and Random_sampling_widget.value == False and test_size_widget.value > 1 and type(test_size_widget.value) == float):
-                            print(f"Dataset not loaded! Test size dataset must be in the range [0,1] or a positive, integer smaller than the population {n}. Enter any value within [0,1] or an integer within [0, {n}]")
+                            print(f"Dataset not loaded! Test size dataset must be in the range [0,1]. Enter any value within [0,1].")
+                        elif (self.Train_test_splitting.value == True and Random_sampling_widget.value == True and test_size_widget.value > 1):
+                            print(f"Dataset not loaded! Test size dataset must be in the range [0,1]. Enter any value within [0,1].")
+                        elif (self.Train_test_splitting.value == True and Random_sampling_widget.value == False and test_size_widget.value > 1):
+                            print(f"Dataset not loaded! Test size dataset must be in the range [0,1]. Enter any value within [0,1].")
                         else:
                             dataset_dict=import_file(filename=filename_widget.value, sample_size=Sample_size_widget.value, random_sampling=Random_sampling_widget.value, 
-                                                     header=None if Header_widget.value==-1 else Header_widget.value, index_col=None if Index_col_widget.value==-1 else Index_col_widget.value,
-                                                     sep = Sep_widget.value, train_test_splitting=self.Train_test_splitting.value, test_size=test_size_widget.value, 
-                                                     random_state=Random_state_widget.value)
+                                                 header=None if Header_widget.value==-1 else Header_widget.value, index_col=None if Index_col_widget.value==-1 else Index_col_widget.value,
+                                                 sep = Sep_widget.value, train_test_splitting=self.Train_test_splitting.value, test_size=test_size_widget.value, 
+                                                 random_state=Random_state_widget.value)
 
                             self.Data_dict['x']=dataset_dict['x'] 
                             self.Data_dict['y']=dataset_dict['y']
