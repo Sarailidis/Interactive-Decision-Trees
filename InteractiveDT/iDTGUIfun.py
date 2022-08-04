@@ -1244,121 +1244,124 @@ class InteractiveDecisionTreesGUI():
         def plot_confusion_matrix(pltcm):
             ConfusionMatrix_out.clear_output()
             with ConfusionMatrix_out:
-                if Tree_state_widget.value == 'No expert tree interactions':
-                    tree_orig=tree.DecisionTreeClassifier(criterion=inter_3.widget.kwargs['criterion'], splitter=inter_3.widget.kwargs['splitter'], max_depth=inter_3.widget.kwargs['max_depth'],
-                                                          min_samples_split=inter_3.widget.kwargs['min_samples_split'], min_samples_leaf=inter_3.widget.kwargs['min_samples_leaf'],
-                                                          min_weight_fraction_leaf=0.0, max_features=inter_3.widget.kwargs['max_features'], random_state=inter_3.widget.kwargs['random_state'],
-                                                          max_leaf_nodes=inter_3.widget.kwargs['max_leaf_nodes'], min_impurity_decrease=inter_3.widget.kwargs['min_impurity_decrease'],
-                                                          min_impurity_split=None, class_weight=None,ccp_alpha=0.0) 
-                    tree_orig.fit(self.Data_dict['x'],self.Data_dict['y']) 
-                    if self.Train_test_splitting.value == True:
-                        CM_train=confusion_matrix(self.Data_dict['y'], tree_orig.predict(self.Data_dict['x']), labels=self.classes_dict['Classes Labels'])
-                        CM_train_display=ConfusionMatrixDisplay(CM_train, self.classes_dict['Classes Labels'])
-                        CM_test=confusion_matrix(self.Data_dict['w'], tree_orig.predict(self.Data_dict['z']), labels=self.classes_dict['Classes Labels'])
-                        CM_test_display=ConfusionMatrixDisplay(CM_test, self.classes_dict['Classes Labels'])
-                        CM_display_dict = {'Train': CM_train_display, 'Test': CM_test_display}
-                        f, axes = plt.subplots(1, 2, figsize=(20, 5), sharey='row')
-                        for i, (key, CM_display_dict) in enumerate(CM_display_dict.items()):
-                            CM_display_dict.plot(ax=axes[i], xticks_rotation=45)
-                            CM_display_dict.ax_.set_title(key)
-                            CM_display_dict.im_.colorbar.remove()
-                            CM_display_dict.ax_.set_xlabel('Predicted')
-                            if i!=0:
-                                CM_display_dict.ax_.set_ylabel('')
-                        plt.subplots_adjust(wspace=0.40, hspace=0.1)
-                        f.colorbar(CM_display_dict.im_, ax=axes)
-                        plt.show()
-                    elif self.Train_test_splitting.value == False:
-                        CM=confusion_matrix(self.Data_dict['y'], tree_orig.predict(self.Data_dict['x']), labels=self.classes_dict['Classes Labels'])
-                        CM_display=ConfusionMatrixDisplay(CM, self.classes_dict['Classes Labels'])
-                        CM_display_dict = {'Confusion Matrix': CM_display}
-                        f, axes = plt.subplots(1, 1, figsize=(20, 5))
-                        for i, (key, CM_display_dict) in enumerate(CM_display_dict.items()):
-                            CM_display_dict.plot(ax=axes[i], xticks_rotation=45)
-                            CM_display_dict.ax_.set_title(key)
-                            CM_display_dict.im_.colorbar.remove()
-                            CM_display_dict.ax_.set_xlabel('Predicted')
-                        f.colorbar(CM_display_dict.im_, ax=axes)
-                        plt.show()
-                elif Tree_state_widget.value == 'Tree was last modified':
-                    if self.Train_test_splitting.value == True:
-                        #Make predictions on train set:
-                        predicted_iDT_train=iDT.classify(base.Last_modified_tree, self.Data_dict['x'])
-                        predicted_iDT_train.classify()
-                        #Make predictions on test set:      
-                        predicted_iDT_test=iDT.classify(base.Last_modified_tree, self.Data_dict['z'])
-                        predicted_iDT_test.classify()
-                        #Calculate confusion Matrices:
-                        CM_train=confusion_matrix(self.Data_dict['y'], predicted_iDT_train.predicted_classes, labels=self.classes_dict['Classes Labels'])
-                        CM_train_display=ConfusionMatrixDisplay(CM_train, self.classes_dict['Classes Labels'])
-                        CM_test=confusion_matrix(self.Data_dict['w'], predicted_iDT_test.predicted_classes, labels=self.classes_dict['Classes Labels'])
-                        CM_test_display=ConfusionMatrixDisplay(CM_test, self.classes_dict['Classes Labels'])
-                        CM_display_dict = {'Train': CM_train_display, 'Test': CM_test_display}
-                        f, axes = plt.subplots(1, 2, figsize=(20, 5), sharey='row')
-                        for i, (key, CM_display_dict) in enumerate(CM_display_dict.items()):
-                            CM_display_dict.plot(ax=axes[i], xticks_rotation=45)
-                            CM_display_dict.ax_.set_title(key)
-                            CM_display_dict.im_.colorbar.remove()
-                            CM_display_dict.ax_.set_xlabel('Predicted')
-                            if i!=0:
-                                CM_display_dict.ax_.set_ylabel('')
-                        plt.subplots_adjust(wspace=0.40, hspace=0.1)
-                        f.colorbar(CM_display_dict.im_, ax=axes)
-                        plt.show()
-                    elif self.Train_test_splitting.value == False:
-                        predicted_iDT=iDT.classify(base.Last_modified_tree, self.Data_dict['x'])
-                        predicted_iDT.classify()
-                        #Calculate confusion Matrices:
-                        CM=confusion_matrix(self.Data_dict['y'], predicted_iDT.predicted_classes, labels=self.classes_dict['Classes Labels'])
-                        CM_display=ConfusionMatrixDisplay(CM, self.classes_dict['Classes Labels'])
-                        CM_display_dict = {'Confusion Matrix': CM_display}
-                        f, axes = plt.subplots(1, 1, figsize=(20, 5))
-                        for i, (key, CM_display_dict) in enumerate(CM_display_dict.items()):
-                            CM_display_dict.plot(ax=axes[i], xticks_rotation=45)
-                            CM_display_dict.ax_.set_title(key)
-                            CM_display_dict.im_.colorbar.remove()
-                            CM_display_dict.ax_.set_xlabel('Predicted')
-                        f.colorbar(CM_display_dict.im_, ax=axes)
-                        plt.show()
-                elif Tree_state_widget.value == 'Tree was last pruned':
-                    if self.Train_test_splitting.value == True:
-                        #Make predictions on train set:
-                        predicted_iDT_train=iDT.classify(base_prn.Last_Pruned_tree, self.Data_dict['x'])
-                        predicted_iDT_train.classify()
-                        #Make predictions on test set:      
-                        predicted_iDT_test=iDT.classify(base_prn.Last_Pruned_tree, self.Data_dict['z'])
-                        predicted_iDT_test.classify()
-                        #Calculate confusion Matrices:
-                        CM_train=confusion_matrix(self.Data_dict['y'], predicted_iDT_train.predicted_classes, labels=self.classes_dict['Classes Labels'])
-                        CM_train_display=ConfusionMatrixDisplay(CM_train, self.classes_dict['Classes Labels'])
-                        CM_test=confusion_matrix(self.Data_dict['w'], predicted_iDT_test.predicted_classes, labels=self.classes_dict['Classes Labels'])
-                        CM_test_display=ConfusionMatrixDisplay(CM_test, self.classes_dict['Classes Labels'])
-                        CM_display_dict = {'Train': CM_train_display, 'Test': CM_test_display}
-                        f, axes = plt.subplots(1, 2, figsize=(20, 5), sharey='row')
-                        for i, (key, CM_display_dict) in enumerate(CM_display_dict.items()):
-                            CM_display_dict.plot(ax=axes[i], xticks_rotation=45)
-                            CM_display_dict.ax_.set_title(key)
-                            CM_display_dict.im_.colorbar.remove()
-                            CM_display_dict.ax_.set_xlabel('Predicted')
-                            if i!=0:
-                                CM_display_dict.ax_.set_ylabel('')
-                        plt.subplots_adjust(wspace=0.40, hspace=0.1)
-                        f.colorbar(CM_display_dict.im_, ax=axes)
-                        plt.show()
-                    elif self.Train_test_splitting.value == False:
-                        predicted_iDT=iDT.classify(base_prn.Last_Pruned_tree, self.Data_dict['x'])
-                        predicted_iDT.classify()
-                        CM=confusion_matrix(self.Data_dict['y'], predicted_iDT.predicted_classes, labels=self.classes_dict['Classes Labels'])
-                        CM_display=ConfusionMatrixDisplay(CM, self.classes_dict['Classes Labels'])
-                        CM_display_dict = {'Confusion Matrix': CM_display}
-                        f, axes = plt.subplots(1, 1, figsize=(20, 5))
-                        for i, (key, CM_display_dict) in enumerate(CM_display_dict.items()):
-                            CM_display_dict.plot(ax=axes[i], xticks_rotation=45)
-                            CM_display_dict.ax_.set_title(key)
-                            CM_display_dict.im_.colorbar.remove()
-                            CM_display_dict.ax_.set_xlabel('Predicted')
-                        f.colorbar(CM_display_dict.im_, ax=axes)
-                        plt.show()
+                if len(self.classes_dict['Classes Labels']) == 0:
+                    print("You havent assigned labels to classes. To plot a confusion matrix please first assign labels to classes using the appropriate tool in the Preprocessing Stage tab.")
+                else:
+                    if Tree_state_widget.value == 'No expert tree interactions':
+                        tree_orig=tree.DecisionTreeClassifier(criterion=inter_3.widget.kwargs['criterion'], splitter=inter_3.widget.kwargs['splitter'], max_depth=inter_3.widget.kwargs['max_depth'],
+                                                              min_samples_split=inter_3.widget.kwargs['min_samples_split'], min_samples_leaf=inter_3.widget.kwargs['min_samples_leaf'],
+                                                              min_weight_fraction_leaf=0.0, max_features=inter_3.widget.kwargs['max_features'], random_state=inter_3.widget.kwargs['random_state'],
+                                                              max_leaf_nodes=inter_3.widget.kwargs['max_leaf_nodes'], min_impurity_decrease=inter_3.widget.kwargs['min_impurity_decrease'],
+                                                              min_impurity_split=None, class_weight=None,ccp_alpha=0.0) 
+                        tree_orig.fit(self.Data_dict['x'],self.Data_dict['y']) 
+                        if self.Train_test_splitting.value == True:
+                            CM_train=confusion_matrix(self.Data_dict['y'], tree_orig.predict(self.Data_dict['x']), labels=self.classes_dict['Classes Labels'])
+                            CM_train_display=ConfusionMatrixDisplay(CM_train, self.classes_dict['Classes Labels'])
+                            CM_test=confusion_matrix(self.Data_dict['w'], tree_orig.predict(self.Data_dict['z']), labels=self.classes_dict['Classes Labels'])
+                            CM_test_display=ConfusionMatrixDisplay(CM_test, self.classes_dict['Classes Labels'])
+                            CM_display_dict = {'Train': CM_train_display, 'Test': CM_test_display}
+                            f, axes = plt.subplots(1, 2, figsize=(20, 5), sharey='row')
+                            for i, (key, CM_display_dict) in enumerate(CM_display_dict.items()):
+                                CM_display_dict.plot(ax=axes[i], xticks_rotation=45)
+                                CM_display_dict.ax_.set_title(key)
+                                CM_display_dict.im_.colorbar.remove()
+                                CM_display_dict.ax_.set_xlabel('Predicted')
+                                if i!=0:
+                                    CM_display_dict.ax_.set_ylabel('')
+                            plt.subplots_adjust(wspace=0.40, hspace=0.1)
+                            f.colorbar(CM_display_dict.im_, ax=axes)
+                            plt.show()
+                        elif self.Train_test_splitting.value == False:
+                            CM=confusion_matrix(self.Data_dict['y'], tree_orig.predict(self.Data_dict['x']), labels=self.classes_dict['Classes Labels'])
+                            CM_display=ConfusionMatrixDisplay(CM, self.classes_dict['Classes Labels'])
+                            CM_display_dict = {'Confusion Matrix': CM_display}
+                            f, axes = plt.subplots(1, 1, figsize=(20, 5))
+                            for i, (key, CM_display_dict) in enumerate(CM_display_dict.items()):
+                                CM_display_dict.plot(ax=axes[i], xticks_rotation=45)
+                                CM_display_dict.ax_.set_title(key)
+                                CM_display_dict.im_.colorbar.remove()
+                                CM_display_dict.ax_.set_xlabel('Predicted')
+                            f.colorbar(CM_display_dict.im_, ax=axes)
+                            plt.show()
+                    elif Tree_state_widget.value == 'Tree was last modified':
+                        if self.Train_test_splitting.value == True:
+                            #Make predictions on train set:
+                            predicted_iDT_train=iDT.classify(base.Last_modified_tree, self.Data_dict['x'])
+                            predicted_iDT_train.classify()
+                            #Make predictions on test set:      
+                            predicted_iDT_test=iDT.classify(base.Last_modified_tree, self.Data_dict['z'])
+                            predicted_iDT_test.classify()
+                            #Calculate confusion Matrices:
+                            CM_train=confusion_matrix(self.Data_dict['y'], predicted_iDT_train.predicted_classes, labels=self.classes_dict['Classes Labels'])
+                            CM_train_display=ConfusionMatrixDisplay(CM_train, self.classes_dict['Classes Labels'])
+                            CM_test=confusion_matrix(self.Data_dict['w'], predicted_iDT_test.predicted_classes, labels=self.classes_dict['Classes Labels'])
+                            CM_test_display=ConfusionMatrixDisplay(CM_test, self.classes_dict['Classes Labels'])
+                            CM_display_dict = {'Train': CM_train_display, 'Test': CM_test_display}
+                            f, axes = plt.subplots(1, 2, figsize=(20, 5), sharey='row')
+                            for i, (key, CM_display_dict) in enumerate(CM_display_dict.items()):
+                                CM_display_dict.plot(ax=axes[i], xticks_rotation=45)
+                                CM_display_dict.ax_.set_title(key)
+                                CM_display_dict.im_.colorbar.remove()
+                                CM_display_dict.ax_.set_xlabel('Predicted')
+                                if i!=0:
+                                    CM_display_dict.ax_.set_ylabel('')
+                            plt.subplots_adjust(wspace=0.40, hspace=0.1)
+                            f.colorbar(CM_display_dict.im_, ax=axes)
+                            plt.show()
+                        elif self.Train_test_splitting.value == False:
+                            predicted_iDT=iDT.classify(base.Last_modified_tree, self.Data_dict['x'])
+                            predicted_iDT.classify()
+                            #Calculate confusion Matrices:
+                            CM=confusion_matrix(self.Data_dict['y'], predicted_iDT.predicted_classes, labels=self.classes_dict['Classes Labels'])
+                            CM_display=ConfusionMatrixDisplay(CM, self.classes_dict['Classes Labels'])
+                            CM_display_dict = {'Confusion Matrix': CM_display}
+                            f, axes = plt.subplots(1, 1, figsize=(20, 5))
+                            for i, (key, CM_display_dict) in enumerate(CM_display_dict.items()):
+                                CM_display_dict.plot(ax=axes[i], xticks_rotation=45)
+                                CM_display_dict.ax_.set_title(key)
+                                CM_display_dict.im_.colorbar.remove()
+                                CM_display_dict.ax_.set_xlabel('Predicted')
+                            f.colorbar(CM_display_dict.im_, ax=axes)
+                            plt.show()
+                    elif Tree_state_widget.value == 'Tree was last pruned':
+                        if self.Train_test_splitting.value == True:
+                            #Make predictions on train set:
+                            predicted_iDT_train=iDT.classify(base_prn.Last_Pruned_tree, self.Data_dict['x'])
+                            predicted_iDT_train.classify()
+                            #Make predictions on test set:      
+                            predicted_iDT_test=iDT.classify(base_prn.Last_Pruned_tree, self.Data_dict['z'])
+                            predicted_iDT_test.classify()
+                            #Calculate confusion Matrices:
+                            CM_train=confusion_matrix(self.Data_dict['y'], predicted_iDT_train.predicted_classes, labels=self.classes_dict['Classes Labels'])
+                            CM_train_display=ConfusionMatrixDisplay(CM_train, self.classes_dict['Classes Labels'])
+                            CM_test=confusion_matrix(self.Data_dict['w'], predicted_iDT_test.predicted_classes, labels=self.classes_dict['Classes Labels'])
+                            CM_test_display=ConfusionMatrixDisplay(CM_test, self.classes_dict['Classes Labels'])
+                            CM_display_dict = {'Train': CM_train_display, 'Test': CM_test_display}
+                            f, axes = plt.subplots(1, 2, figsize=(20, 5), sharey='row')
+                            for i, (key, CM_display_dict) in enumerate(CM_display_dict.items()):
+                                CM_display_dict.plot(ax=axes[i], xticks_rotation=45)
+                                CM_display_dict.ax_.set_title(key)
+                                CM_display_dict.im_.colorbar.remove()
+                                CM_display_dict.ax_.set_xlabel('Predicted')
+                                if i!=0:
+                                    CM_display_dict.ax_.set_ylabel('')
+                            plt.subplots_adjust(wspace=0.40, hspace=0.1)
+                            f.colorbar(CM_display_dict.im_, ax=axes)
+                            plt.show()
+                        elif self.Train_test_splitting.value == False:
+                            predicted_iDT=iDT.classify(base_prn.Last_Pruned_tree, self.Data_dict['x'])
+                            predicted_iDT.classify()
+                            CM=confusion_matrix(self.Data_dict['y'], predicted_iDT.predicted_classes, labels=self.classes_dict['Classes Labels'])
+                            CM_display=ConfusionMatrixDisplay(CM, self.classes_dict['Classes Labels'])
+                            CM_display_dict = {'Confusion Matrix': CM_display}
+                            f, axes = plt.subplots(1, 1, figsize=(20, 5))
+                            for i, (key, CM_display_dict) in enumerate(CM_display_dict.items()):
+                                CM_display_dict.plot(ax=axes[i], xticks_rotation=45)
+                                CM_display_dict.ax_.set_title(key)
+                                CM_display_dict.im_.colorbar.remove()
+                                CM_display_dict.ax_.set_xlabel('Predicted')
+                            f.colorbar(CM_display_dict.im_, ax=axes)
+                            plt.show()
 
         #Assign the above function to calculate accuracy button click
         ConfusionMatrix_button.on_click(plot_confusion_matrix)
