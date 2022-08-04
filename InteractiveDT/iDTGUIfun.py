@@ -782,33 +782,26 @@ class InteractiveDecisionTreesGUI():
         def apply_changes(appch):
             Apply_changes_out.clear_output()
             with Apply_changes_out:
-                #Checking for errors caused by invalid user inputs
-                #Invalid max_leaf nodes for left subtree
-                if max_leaf_nodes_left_widget.value <= 1:
-                    print("Maximum leaf nodes in the new left subtree must be greater than 1. A value <= 1 is given. Enter a value > 1.")
-                #Invalid max_leaf nodes for right subtree
-                elif max_leaf_nodes_right_widget.value <= 1:
-                    print("Maximum leaf nodes in the new right subtree must be greater than 1. A value <= 1 is given. Enter a value > 1.")
-                #Invalid split point value
-                elif (Split_point_widget.value > max(self.Data_dict['x'][Feature_to_Split_widget.value]) or Split_point_widget.value < min(self.Data_dict['x'][Feature_to_Split_widget.value])):
-                    print(f"Splitting threshold must be in the range [{min(self.Data_dict['x'][Feature_to_Split_widget.value])}, {max(self.Data_dict['x'][Feature_to_Split_widget.value])}]. A value outside this range is given. Enter a value within the range.")
+                #Check if the user has assigned labels to classes:
+                if len(self.classes_dict['Classes Labels']) == 0:
+                    print("You havent assigned labels to classes. Please first assign labels to classes using the appropriate tool in the Preprocessing Stage tab.")
                 else:
-                    global counter
-                    global base
-                    if tree_is_pruned_widget.value == False:
-                        if Refresh_widget_mdf.value == True:
-                            #Check for invalid split point value
-                            max_val = max(self.Data_dict['x'][Feature_to_Split_widget.value])
-                            min_val = min(self.Data_dict['x'][Feature_to_Split_widget.value])
-                            if (Split_point_widget.value > max_val or Split_point_widget.value < min_val):
-                                print(f"Splitting threshold must be in the range [{min_val}, {max_val}]. A value outside this range is given. Enter a value within the range.")
-                            else:
-                                base=modify_nodes()
-                                base.first_modification()
-                                self.counter+=1
-                        elif Refresh_widget_mdf.value == False:
-                            #Check for invalid split point value
-                            if self.counter==0:
+                    #Checking for errors caused by invalid user inputs
+                    #Invalid max_leaf nodes for left subtree
+                    if max_leaf_nodes_left_widget.value <= 1:
+                        print("Maximum leaf nodes in the new left subtree must be greater than 1. A value <= 1 is given. Enter a value > 1.")
+                    #Invalid max_leaf nodes for right subtree
+                    elif max_leaf_nodes_right_widget.value <= 1:
+                        print("Maximum leaf nodes in the new right subtree must be greater than 1. A value <= 1 is given. Enter a value > 1.")
+                    #Invalid split point value
+                    elif (Split_point_widget.value > max(self.Data_dict['x'][Feature_to_Split_widget.value]) or Split_point_widget.value < min(self.Data_dict['x'][Feature_to_Split_widget.value])):
+                        print(f"Splitting threshold must be in the range [{min(self.Data_dict['x'][Feature_to_Split_widget.value])}, {max(self.Data_dict['x'][Feature_to_Split_widget.value])}]. A value outside this range is given. Enter a value within the range.")
+                    else:
+                        global counter
+                        global base
+                        if tree_is_pruned_widget.value == False:
+                            if Refresh_widget_mdf.value == True:
+                                #Check for invalid split point value
                                 max_val = max(self.Data_dict['x'][Feature_to_Split_widget.value])
                                 min_val = min(self.Data_dict['x'][Feature_to_Split_widget.value])
                                 if (Split_point_widget.value > max_val or Split_point_widget.value < min_val):
@@ -817,30 +810,29 @@ class InteractiveDecisionTreesGUI():
                                     base=modify_nodes()
                                     base.first_modification()
                                     self.counter+=1
-                            elif self.counter>0:
+                            elif Refresh_widget_mdf.value == False:
                                 #Check for invalid split point value
-                                NodeData = iDT.get_nodes_data(base.Last_modified_tree, self.Data_dict['x'])
-                                min_val = min(NodeData[Node_id_widget.value][Feature_to_Split_widget.value])
-                                max_val = max(NodeData[Node_id_widget.value][Feature_to_Split_widget.value])
-                                if (Split_point_widget.value > max_val or Split_point_widget.value < min_val):
-                                    print(f"Splitting threshold must be in the range [{min_val}, {max_val}]. A value outside this range is given. Enter a value within the range.")
-                                else:
-                                    base.modify()  
-                                    self.counter+=1
-                    elif tree_is_pruned_widget.value == True:
-                        if Refresh_widget_mdf.value == True:
-                            #Check for invalid split point value
-                            NodeData = iDT.get_nodes_data(base_prn.Last_Pruned_tree, self.Data_dict['x'])
-                            min_val = min(NodeData[Node_id_widget.value][Feature_to_Split_widget.value])
-                            max_val = max(NodeData[Node_id_widget.value][Feature_to_Split_widget.value])
-                            base=modify_nodes(tree_is_pruned = tree_is_pruned_widget.value, Pruned_tree = base_prn.Last_Pruned_tree)
-                            if (Split_point_widget.value > max_val or Split_point_widget.value < min_val):
-                                print(f"Splitting threshold must be in the range [{min_val}, {max_val}]. A value outside this range is given. Enter a value within the range.")
-                            else:
-                                base.first_modification()
-                                self.counter+=1
-                        elif Refresh_widget_mdf.value == False:
-                            if self.counter==0:
+                                if self.counter==0:
+                                    max_val = max(self.Data_dict['x'][Feature_to_Split_widget.value])
+                                    min_val = min(self.Data_dict['x'][Feature_to_Split_widget.value])
+                                    if (Split_point_widget.value > max_val or Split_point_widget.value < min_val):
+                                        print(f"Splitting threshold must be in the range [{min_val}, {max_val}]. A value outside this range is given. Enter a value within the range.")
+                                    else:
+                                        base=modify_nodes()
+                                        base.first_modification()
+                                        self.counter+=1
+                                elif self.counter>0:
+                                    #Check for invalid split point value
+                                    NodeData = iDT.get_nodes_data(base.Last_modified_tree, self.Data_dict['x'])
+                                    min_val = min(NodeData[Node_id_widget.value][Feature_to_Split_widget.value])
+                                    max_val = max(NodeData[Node_id_widget.value][Feature_to_Split_widget.value])
+                                    if (Split_point_widget.value > max_val or Split_point_widget.value < min_val):
+                                        print(f"Splitting threshold must be in the range [{min_val}, {max_val}]. A value outside this range is given. Enter a value within the range.")
+                                    else:
+                                        base.modify()  
+                                        self.counter+=1
+                        elif tree_is_pruned_widget.value == True:
+                            if Refresh_widget_mdf.value == True:
                                 #Check for invalid split point value
                                 NodeData = iDT.get_nodes_data(base_prn.Last_Pruned_tree, self.Data_dict['x'])
                                 min_val = min(NodeData[Node_id_widget.value][Feature_to_Split_widget.value])
@@ -849,21 +841,33 @@ class InteractiveDecisionTreesGUI():
                                 if (Split_point_widget.value > max_val or Split_point_widget.value < min_val):
                                     print(f"Splitting threshold must be in the range [{min_val}, {max_val}]. A value outside this range is given. Enter a value within the range.")
                                 else:
-                                    base=modify_nodes(tree_is_pruned = tree_is_pruned_widget.value, Pruned_tree = base_prn.Last_Pruned_tree)
                                     base.first_modification()
                                     self.counter+=1
-                            elif self.counter>0:
-                                #Check for invalid split point value
-                                NodeData = iDT.get_nodes_data(base_prn.Last_Pruned_tree, self.Data_dict['x'])
-                                min_val = min(NodeData[Node_id_widget.value][Feature_to_Split_widget.value])
-                                max_val = max(NodeData[Node_id_widget.value][Feature_to_Split_widget.value])
-                                base=modify_nodes(tree_is_pruned = tree_is_pruned_widget.value, Pruned_tree = base_prn.Last_Pruned_tree)
-                                if (Split_point_widget.value > max_val or Split_point_widget.value < min_val):
-                                    print(f"Splitting threshold must be in the range [{min_val}, {max_val}]. A value outside this range is given. Enter a value within the range.")
-                                else:
+                            elif Refresh_widget_mdf.value == False:
+                                if self.counter==0:
+                                    #Check for invalid split point value
+                                    NodeData = iDT.get_nodes_data(base_prn.Last_Pruned_tree, self.Data_dict['x'])
+                                    min_val = min(NodeData[Node_id_widget.value][Feature_to_Split_widget.value])
+                                    max_val = max(NodeData[Node_id_widget.value][Feature_to_Split_widget.value])
                                     base=modify_nodes(tree_is_pruned = tree_is_pruned_widget.value, Pruned_tree = base_prn.Last_Pruned_tree)
-                                    base.modify()  
-                                    self.counter+=1
+                                    if (Split_point_widget.value > max_val or Split_point_widget.value < min_val):
+                                        print(f"Splitting threshold must be in the range [{min_val}, {max_val}]. A value outside this range is given. Enter a value within the range.")
+                                    else:
+                                        base=modify_nodes(tree_is_pruned = tree_is_pruned_widget.value, Pruned_tree = base_prn.Last_Pruned_tree)
+                                        base.first_modification()
+                                        self.counter+=1
+                                elif self.counter>0:
+                                    #Check for invalid split point value
+                                    NodeData = iDT.get_nodes_data(base_prn.Last_Pruned_tree, self.Data_dict['x'])
+                                    min_val = min(NodeData[Node_id_widget.value][Feature_to_Split_widget.value])
+                                    max_val = max(NodeData[Node_id_widget.value][Feature_to_Split_widget.value])
+                                    base=modify_nodes(tree_is_pruned = tree_is_pruned_widget.value, Pruned_tree = base_prn.Last_Pruned_tree)
+                                    if (Split_point_widget.value > max_val or Split_point_widget.value < min_val):
+                                        print(f"Splitting threshold must be in the range [{min_val}, {max_val}]. A value outside this range is given. Enter a value within the range.")
+                                    else:
+                                        base=modify_nodes(tree_is_pruned = tree_is_pruned_widget.value, Pruned_tree = base_prn.Last_Pruned_tree)
+                                        base.modify()  
+                                        self.counter+=1
 
 
 
@@ -959,74 +963,62 @@ class InteractiveDecisionTreesGUI():
             with prune_out:
                 global counter_prn
                 global base_prn
-                #Check for invalid user inputs:
-                if Tree_is_modified_widget.value == False:
-                    if Refresh_widget.value == True:
-                        base_prn=Pruning(node_to_prune_widget.value, TreeStructure_orig, Data_dict = self.Data_dict, classes_dict = self.classes_dict, Features_color_groups = self.Features_color_groups,
-                                             modified = Tree_is_modified_widget.value)
-                        #Check for invalid user inputs
-                        #Node id given greater than total number of nodes
-                        if ((isinstance(base_prn.Tree_to_prune, iDT.TreeStructure) and node_to_prune_widget.value > base_prn.Tree_to_prune.n_nodes) or
-                            (isinstance(base_prn.Tree_to_prune, pd.DataFrame) and node_to_prune_widget.value > len(base_prn.Tree_to_prune.loc[:,:]))):
-                            print("The id of the node to be pruned must not exceed the total number of nodes in the tree. Enter a valid node id")
-                        #Node id given not a leaf node
-                        elif ((isinstance(base_prn.Tree_to_prune, iDT.TreeStructure) and node_to_prune_widget.value in base_prn.Tree_to_prune.leaves) or
-                            (isinstance(base_prn.Tree_to_prune, pd.DataFrame) and node_to_prune_widget.value in list(base_prn.Tree_to_prune.loc[base_prn.Tree_to_prune.loc[:,'nodes_thresholds'] == -2, 'Id']))):
-                            print("The id of the node to be pruned must not be a leaf. An id of a leaf node is given. Enter a test (internal) node id")
-                        else:
-#                             base_prn=Pruning(node_to_prune_widget.value, TreeStructure_orig, Data_dict = self.Data_dict, classes_dict = self.classes_dict, Features_color_groups = self.Features_color_groups,
-#                                              modified = Tree_is_modified_widget.value)
-                            base_prn.first_pruning()
-                            self.counter_prn+=1
-                    elif Refresh_widget.value == False:
-                        if self.counter_prn==0:
-                            base_prn=Pruning(node_to_prune_widget.value, TreeStructure_orig, Data_dict = self.Data_dict, classes_dict = self.classes_dict, 
-                                             Features_color_groups = self.Features_color_groups, modified = Tree_is_modified_widget.value)
+                #Check if the user has assigned labels to classes:
+                if len(self.classes_dict['Classes Labels']) == 0:
+                    print("You havent assigned labels to classes. Please first assign labels to classes using the appropriate tool in the Preprocessing Stage tab.")
+                else:
+                    #Check for invalid user inputs:
+                    if Tree_is_modified_widget.value == False:
+                        if Refresh_widget.value == True:
+                            base_prn=Pruning(node_to_prune_widget.value, TreeStructure_orig, Data_dict = self.Data_dict, classes_dict = self.classes_dict, Features_color_groups = self.Features_color_groups,
+                                                 modified = Tree_is_modified_widget.value)
                             #Check for invalid user inputs
                             #Node id given greater than total number of nodes
                             if ((isinstance(base_prn.Tree_to_prune, iDT.TreeStructure) and node_to_prune_widget.value > base_prn.Tree_to_prune.n_nodes) or
                                 (isinstance(base_prn.Tree_to_prune, pd.DataFrame) and node_to_prune_widget.value > len(base_prn.Tree_to_prune.loc[:,:]))):
                                 print("The id of the node to be pruned must not exceed the total number of nodes in the tree. Enter a valid node id")
-                            #Node id given greater than total number of nodes
+                            #Node id given not a leaf node
                             elif ((isinstance(base_prn.Tree_to_prune, iDT.TreeStructure) and node_to_prune_widget.value in base_prn.Tree_to_prune.leaves) or
-                                  (isinstance(base_prn.Tree_to_prune, pd.DataFrame) and node_to_prune_widget.value in list(base_prn.Tree_to_prune.loc[base_prn.Tree_to_prune.loc[:,'nodes_thresholds'] == -2, 'Id']))):
+                                (isinstance(base_prn.Tree_to_prune, pd.DataFrame) and node_to_prune_widget.value in list(base_prn.Tree_to_prune.loc[base_prn.Tree_to_prune.loc[:,'nodes_thresholds'] == -2, 'Id']))):
                                 print("The id of the node to be pruned must not be a leaf. An id of a leaf node is given. Enter a test (internal) node id")
                             else:
-#                                 base_prn=Pruning(node_to_prune_widget.value, TreeStructure_orig, Data_dict = self.Data_dict, classes_dict = self.classes_dict, 
-#                                                  Features_color_groups = self.Features_color_groups, modified = Tree_is_modified_widget.value)
+    #                             base_prn=Pruning(node_to_prune_widget.value, TreeStructure_orig, Data_dict = self.Data_dict, classes_dict = self.classes_dict, Features_color_groups = self.Features_color_groups,
+    #                                              modified = Tree_is_modified_widget.value)
                                 base_prn.first_pruning()
                                 self.counter_prn+=1
-                        elif self.counter_prn>0:
-                            #Check for invalid user inputs
-                            #Node id given greater than total number of nodes
-                            if ((isinstance(base_prn.Last_Pruned_tree, iDT.TreeStructure) and node_to_prune_widget.value > base_prn.Last_Pruned_tree.n_nodes) or
-                                (isinstance(base_prn.Last_Pruned_tree, pd.DataFrame) and node_to_prune_widget.value > len(base_prn.Last_Pruned_tree.loc[:,:]))):
-                                print("The id of the node to be pruned must not exceed the total number of nodes in the tree. Enter a valid node id")
-                            #Node id given greater than total number of nodes
-                            elif ((isinstance(base_prn.Last_Pruned_tree, iDT.TreeStructure) and node_to_prune_widget.value in base_prn.Last_Pruned_tree.leaves) or
-                                  (isinstance(base_prn.Last_Pruned_tree, pd.DataFrame) and node_to_prune_widget.value in list(base_prn.Last_Pruned_tree.loc[base_prn.Last_Pruned_tree.loc[:,'nodes_thresholds'] == -2, 'Id']))):
-                                print("The id of the node to be pruned must not be a leaf. An id of a leaf node is given. Enter a test (internal) node id")
-                            else:
-                                base_prn.pruning(node_to_prune_widget.value)  
-                                self.counter_prn+=1
-                elif Tree_is_modified_widget.value == True:
-                    if Refresh_widget.value == True:
-                        #Check for invalid user inputs
-                        #Node id given greater than total number of nodes
-                        if ((isinstance(base.Last_modified_tree, iDT.TreeStructure) and node_to_prune_widget.value > base.Last_modified_tree.n_nodes) or
-                            (isinstance(base.Last_modified_tree, pd.DataFrame) and node_to_prune_widget.value > len(base.Last_modified_tree.loc[:,:]))):
-                            print("The id of the node to be pruned must not exceed the total number of nodes in the tree. Enter a valid node id")
-                        #Node id given greater than total number of nodes
-                        elif ((isinstance(base.Last_modified_tree, iDT.TreeStructure) and node_to_prune_widget.value in base.Last_modified_tree.leaves) or
-                              (isinstance(base.Last_modified_tree, pd.DataFrame) and node_to_prune_widget.value in list(base.Last_modified_tree.loc[base.Last_modified_tree.loc[:,'nodes_thresholds'] == -2, 'Id']))):
-                            print("The id of the node to be pruned must not be a leaf. An id of a leaf node is given. Enter a test (internal) node id")
-                        else:
-                            base_prn=Pruning(node_to_prune_widget.value, base.Last_modified_tree, Data_dict = self.Data_dict, classes_dict = self.classes_dict, 
-                                             Features_color_groups = self.Features_color_groups, modified = Tree_is_modified_widget.value)
-                            base_prn.first_pruning()
-                            self.counter_prn+=1
-                    elif Refresh_widget.value == False:
-                        if self.counter_prn==0:
+                        elif Refresh_widget.value == False:
+                            if self.counter_prn==0:
+                                base_prn=Pruning(node_to_prune_widget.value, TreeStructure_orig, Data_dict = self.Data_dict, classes_dict = self.classes_dict, 
+                                                 Features_color_groups = self.Features_color_groups, modified = Tree_is_modified_widget.value)
+                                #Check for invalid user inputs
+                                #Node id given greater than total number of nodes
+                                if ((isinstance(base_prn.Tree_to_prune, iDT.TreeStructure) and node_to_prune_widget.value > base_prn.Tree_to_prune.n_nodes) or
+                                    (isinstance(base_prn.Tree_to_prune, pd.DataFrame) and node_to_prune_widget.value > len(base_prn.Tree_to_prune.loc[:,:]))):
+                                    print("The id of the node to be pruned must not exceed the total number of nodes in the tree. Enter a valid node id")
+                                #Node id given greater than total number of nodes
+                                elif ((isinstance(base_prn.Tree_to_prune, iDT.TreeStructure) and node_to_prune_widget.value in base_prn.Tree_to_prune.leaves) or
+                                      (isinstance(base_prn.Tree_to_prune, pd.DataFrame) and node_to_prune_widget.value in list(base_prn.Tree_to_prune.loc[base_prn.Tree_to_prune.loc[:,'nodes_thresholds'] == -2, 'Id']))):
+                                    print("The id of the node to be pruned must not be a leaf. An id of a leaf node is given. Enter a test (internal) node id")
+                                else:
+    #                                 base_prn=Pruning(node_to_prune_widget.value, TreeStructure_orig, Data_dict = self.Data_dict, classes_dict = self.classes_dict, 
+    #                                                  Features_color_groups = self.Features_color_groups, modified = Tree_is_modified_widget.value)
+                                    base_prn.first_pruning()
+                                    self.counter_prn+=1
+                            elif self.counter_prn>0:
+                                #Check for invalid user inputs
+                                #Node id given greater than total number of nodes
+                                if ((isinstance(base_prn.Last_Pruned_tree, iDT.TreeStructure) and node_to_prune_widget.value > base_prn.Last_Pruned_tree.n_nodes) or
+                                    (isinstance(base_prn.Last_Pruned_tree, pd.DataFrame) and node_to_prune_widget.value > len(base_prn.Last_Pruned_tree.loc[:,:]))):
+                                    print("The id of the node to be pruned must not exceed the total number of nodes in the tree. Enter a valid node id")
+                                #Node id given greater than total number of nodes
+                                elif ((isinstance(base_prn.Last_Pruned_tree, iDT.TreeStructure) and node_to_prune_widget.value in base_prn.Last_Pruned_tree.leaves) or
+                                      (isinstance(base_prn.Last_Pruned_tree, pd.DataFrame) and node_to_prune_widget.value in list(base_prn.Last_Pruned_tree.loc[base_prn.Last_Pruned_tree.loc[:,'nodes_thresholds'] == -2, 'Id']))):
+                                    print("The id of the node to be pruned must not be a leaf. An id of a leaf node is given. Enter a test (internal) node id")
+                                else:
+                                    base_prn.pruning(node_to_prune_widget.value)  
+                                    self.counter_prn+=1
+                    elif Tree_is_modified_widget.value == True:
+                        if Refresh_widget.value == True:
                             #Check for invalid user inputs
                             #Node id given greater than total number of nodes
                             if ((isinstance(base.Last_modified_tree, iDT.TreeStructure) and node_to_prune_widget.value > base.Last_modified_tree.n_nodes) or
@@ -1034,26 +1026,42 @@ class InteractiveDecisionTreesGUI():
                                 print("The id of the node to be pruned must not exceed the total number of nodes in the tree. Enter a valid node id")
                             #Node id given greater than total number of nodes
                             elif ((isinstance(base.Last_modified_tree, iDT.TreeStructure) and node_to_prune_widget.value in base.Last_modified_tree.leaves) or
-                                (isinstance(base.Last_modified_tree, pd.DataFrame) and node_to_prune_widget.value in list(base.Last_modified_tree.loc[base.Last_modified_tree.loc[:,'nodes_thresholds'] == -2, 'Id']))):
+                                  (isinstance(base.Last_modified_tree, pd.DataFrame) and node_to_prune_widget.value in list(base.Last_modified_tree.loc[base.Last_modified_tree.loc[:,'nodes_thresholds'] == -2, 'Id']))):
                                 print("The id of the node to be pruned must not be a leaf. An id of a leaf node is given. Enter a test (internal) node id")
                             else:
                                 base_prn=Pruning(node_to_prune_widget.value, base.Last_modified_tree, Data_dict = self.Data_dict, classes_dict = self.classes_dict, 
                                                  Features_color_groups = self.Features_color_groups, modified = Tree_is_modified_widget.value)
                                 base_prn.first_pruning()
                                 self.counter_prn+=1
-                        elif self.counter_prn>0:
-                            #Check for invalid user inputs
-                            #Node id given greater than total number of nodes
-                            if ((isinstance(base.Last_modified_tree, iDT.TreeStructure) and node_to_prune_widget.value > base.Last_modified_tree.n_nodes) or
-                                (isinstance(base.Last_modified_tree, pd.DataFrame) and node_to_prune_widget.value > len(base.Last_modified_tree.loc[:,:]))):
-                                print("The id of the node to be pruned must not exceed the total number of nodes in the tree. Enter a valid node id")
-                            #Node id given greater than total number of nodes
-                            elif ((isinstance(base.Last_modified_tree, iDT.TreeStructure) and node_to_prune_widget.value in base.Last_modified_tree.leaves) or
-                                (isinstance(base.Last_modified_tree, pd.DataFrame) and node_to_prune_widget.value in list(base.Last_modified_tree.loc[base.Last_modified_tree.loc[:,'nodes_thresholds'] == -2, 'Id']))):
-                                print("The id of the node to be pruned must not be a leaf. An id of a leaf node is given. Enter a test (internal) node id")
-                            else:
-                                base_prn.pruning(node_to_prune_widget.value, base.Last_modified_tree)  
-                                self.counter_prn+=1
+                        elif Refresh_widget.value == False:
+                            if self.counter_prn==0:
+                                #Check for invalid user inputs
+                                #Node id given greater than total number of nodes
+                                if ((isinstance(base.Last_modified_tree, iDT.TreeStructure) and node_to_prune_widget.value > base.Last_modified_tree.n_nodes) or
+                                    (isinstance(base.Last_modified_tree, pd.DataFrame) and node_to_prune_widget.value > len(base.Last_modified_tree.loc[:,:]))):
+                                    print("The id of the node to be pruned must not exceed the total number of nodes in the tree. Enter a valid node id")
+                                #Node id given greater than total number of nodes
+                                elif ((isinstance(base.Last_modified_tree, iDT.TreeStructure) and node_to_prune_widget.value in base.Last_modified_tree.leaves) or
+                                    (isinstance(base.Last_modified_tree, pd.DataFrame) and node_to_prune_widget.value in list(base.Last_modified_tree.loc[base.Last_modified_tree.loc[:,'nodes_thresholds'] == -2, 'Id']))):
+                                    print("The id of the node to be pruned must not be a leaf. An id of a leaf node is given. Enter a test (internal) node id")
+                                else:
+                                    base_prn=Pruning(node_to_prune_widget.value, base.Last_modified_tree, Data_dict = self.Data_dict, classes_dict = self.classes_dict, 
+                                                     Features_color_groups = self.Features_color_groups, modified = Tree_is_modified_widget.value)
+                                    base_prn.first_pruning()
+                                    self.counter_prn+=1
+                            elif self.counter_prn>0:
+                                #Check for invalid user inputs
+                                #Node id given greater than total number of nodes
+                                if ((isinstance(base.Last_modified_tree, iDT.TreeStructure) and node_to_prune_widget.value > base.Last_modified_tree.n_nodes) or
+                                    (isinstance(base.Last_modified_tree, pd.DataFrame) and node_to_prune_widget.value > len(base.Last_modified_tree.loc[:,:]))):
+                                    print("The id of the node to be pruned must not exceed the total number of nodes in the tree. Enter a valid node id")
+                                #Node id given greater than total number of nodes
+                                elif ((isinstance(base.Last_modified_tree, iDT.TreeStructure) and node_to_prune_widget.value in base.Last_modified_tree.leaves) or
+                                    (isinstance(base.Last_modified_tree, pd.DataFrame) and node_to_prune_widget.value in list(base.Last_modified_tree.loc[base.Last_modified_tree.loc[:,'nodes_thresholds'] == -2, 'Id']))):
+                                    print("The id of the node to be pruned must not be a leaf. An id of a leaf node is given. Enter a test (internal) node id")
+                                else:
+                                    base_prn.pruning(node_to_prune_widget.value, base.Last_modified_tree)  
+                                    self.counter_prn+=1
 
         #Assign the above function to prune button click
         Prune_button.on_click(Prune)        
@@ -1078,61 +1086,36 @@ class InteractiveDecisionTreesGUI():
         def change_leaf_node_class(chg_cl):
             change_leaf_node_class_out.clear_output()
             with change_leaf_node_class_out: 
-                if self.counter == 0 and self.counter_prn == 0:
-                    global base
-                    base = modify_nodes()
-                    #Check for invalid user inputs
-                    #Node id given is not a leaf
-                    if (isinstance(base.Tree_to_modify_str, iDT.TreeStructure) and base.Tree_to_modify_str.feature_labels[leaf_node_id_widget.value] != 'leaf_node' or
-                        isinstance(base.Tree_to_modify_str, pd.DataFrame) and base.Tree_to_modify_str.loc[leaf_node_id_widget.value,'nodes_labels'] != 'leaf_node'):
-                        print("The node id must be a leaf node. A test node id is given. Enter a leaf node id")
-                    elif(new_class_widget.value not in self.classes_dict['Classes Labels']):
-#                     elif (isinstance(base.Tree_to_modify_str, iDT.TreeStructure) and new_class_widget.value not in base.Tree_to_modify_str.Node_classes or
-#                           isinstance(base.Tree_to_modify_str, pd.DataFrame) and new_class_widget.value not in list(base.Tree_to_modify_str.loc[leaf_node_id_widget.value,'nodes_classes'])):
-                        print("The new class does not exist in the dataset. Define the new class using the corresponding tool in the preprocessing stage tab")
-                    else:
-                        iDT.change_class(leaf_node_id_widget.value, base.Tree_to_modify_str, new_class_widget.value)
-                        iDT.Plot_Tree(base.Tree_to_modify_str, self.classes_dict, criterion=inter_3.widget.kwargs['criterion'], Best_first_Tree_Builder=True, 
-                                        nodes_coloring=inter_3.widget.kwargs['nodes_coloring'], edges_shape=inter_3.widget.kwargs['edges_shape'], 
-                                        User_features_color_groups=None if inter_3.widget.kwargs['nodes_coloring'] != 'Features_color_groups' else self.Features_color_groups,
-                                        plot_width=inter_3.widget.kwargs['plot_width'], plot_height=inter_3.widget.kwargs['plot_height'], 
-                                        mrk_size=inter_3.widget.kwargs['mrk_size'], txt_size=inter_3.widget.kwargs['txt_size'], 
-                                        opacity_edges=inter_3.widget.kwargs['opacity_edges'], opacity_nodes=inter_3.widget.kwargs['opacity_nodes'], show_figure=True)
-                elif self.counter != 0 and self.counter_prn == 0:
-                    if (isinstance(base.Last_modified_tree, iDT.TreeStructure) and base.Last_modified_tree.feature_labels[leaf_node_id_widget.value] != 'leaf_node' or
-                        isinstance(base.Last_modified_tree, pd.DataFrame) and base.Last_modified_tree.loc[leaf_node_id_widget.value,'nodes_labels'] != 'leaf_node'):
-                        print("The node id must be a leaf node. A test node id is given. Enter a leaf node id")
-                    elif(new_class_widget.value not in self.classes_dict['Classes Labels']):
-                        print("The new class does not exist in the dataset. Define the new class using the corresponding tool in the preprocessing stage tab.")
-                    else:
-                        iDT.change_class(leaf_node_id_widget.value, base.Last_modified_tree, new_class_widget.value)
-                        iDT.Plot_Tree(base.Last_modified_tree, self.classes_dict, criterion=inter_3.widget.kwargs['criterion'], Best_first_Tree_Builder=True,
-                                        nodes_coloring=inter_3.widget.kwargs['nodes_coloring'], edges_shape=inter_3.widget.kwargs['edges_shape'], 
-                                        User_features_color_groups=None if inter_3.widget.kwargs['nodes_coloring'] != 'Features_color_groups' else self.Features_color_groups,
-                                        plot_width=inter_3.widget.kwargs['plot_width'], plot_height=inter_3.widget.kwargs['plot_height'], 
-                                        mrk_size=inter_3.widget.kwargs['mrk_size'], txt_size=inter_3.widget.kwargs['txt_size'], 
-                                        opacity_edges=inter_3.widget.kwargs['opacity_edges'], opacity_nodes=inter_3.widget.kwargs['opacity_nodes'], show_figure=True)
-                elif self.counter != 0 and self.counter_prn != 0:
-                    if Last_tree_interaction_widget.value == 'Last pruned':
-                        if (isinstance(base_prn.Last_Pruned_tree, iDT.TreeStructure) and base_prn.Last_Pruned_tree.feature_labels[leaf_node_id_widget.value] != 'leaf_node' or
-                            isinstance(base_prn.Last_Pruned_tree, pd.DataFrame) and base_prn.Last_Pruned_tree.loc[leaf_node_id_widget.value,'nodes_labels'] != 'leaf_node'):
+                #Check if the user has assigned labels to classes:
+                if len(self.classes_dict['Classes Labels']) == 0:
+                    print("You havent assigned labels to classes. Please first assign labels to classes using the appropriate tool in the Preprocessing Stage tab.")
+                else:
+                    if self.counter == 0 and self.counter_prn == 0:
+                        global base
+                        base = modify_nodes()
+                        #Check for invalid user inputs
+                        #Node id given is not a leaf
+                        if (isinstance(base.Tree_to_modify_str, iDT.TreeStructure) and base.Tree_to_modify_str.feature_labels[leaf_node_id_widget.value] != 'leaf_node' or
+                            isinstance(base.Tree_to_modify_str, pd.DataFrame) and base.Tree_to_modify_str.loc[leaf_node_id_widget.value,'nodes_labels'] != 'leaf_node'):
                             print("The node id must be a leaf node. A test node id is given. Enter a leaf node id")
-                        elif (new_class_widget.value not in self.classes_dict['Classes Labels']):
+                        elif(new_class_widget.value not in self.classes_dict['Classes Labels']):
+    #                     elif (isinstance(base.Tree_to_modify_str, iDT.TreeStructure) and new_class_widget.value not in base.Tree_to_modify_str.Node_classes or
+    #                           isinstance(base.Tree_to_modify_str, pd.DataFrame) and new_class_widget.value not in list(base.Tree_to_modify_str.loc[leaf_node_id_widget.value,'nodes_classes'])):
                             print("The new class does not exist in the dataset. Define the new class using the corresponding tool in the preprocessing stage tab")
                         else:
-                            iDT.change_class(leaf_node_id_widget.value, base_prn.Last_Pruned_tree, new_class_widget.value)
-                            iDT.Plot_Tree(base_prn.Last_Pruned_tree, self.classes_dict, criterion=inter_3.widget.kwargs['criterion'], Best_first_Tree_Builder=True,
+                            iDT.change_class(leaf_node_id_widget.value, base.Tree_to_modify_str, new_class_widget.value)
+                            iDT.Plot_Tree(base.Tree_to_modify_str, self.classes_dict, criterion=inter_3.widget.kwargs['criterion'], Best_first_Tree_Builder=True, 
                                             nodes_coloring=inter_3.widget.kwargs['nodes_coloring'], edges_shape=inter_3.widget.kwargs['edges_shape'], 
                                             User_features_color_groups=None if inter_3.widget.kwargs['nodes_coloring'] != 'Features_color_groups' else self.Features_color_groups,
-                                            plot_width=inter_3.widget.kwargs['plot_width'], plot_height=inter_3.widget.kwargs['plot_height'],
+                                            plot_width=inter_3.widget.kwargs['plot_width'], plot_height=inter_3.widget.kwargs['plot_height'], 
                                             mrk_size=inter_3.widget.kwargs['mrk_size'], txt_size=inter_3.widget.kwargs['txt_size'], 
                                             opacity_edges=inter_3.widget.kwargs['opacity_edges'], opacity_nodes=inter_3.widget.kwargs['opacity_nodes'], show_figure=True)
-                    elif Last_tree_interaction_widget.value == 'Last modified':
+                    elif self.counter != 0 and self.counter_prn == 0:
                         if (isinstance(base.Last_modified_tree, iDT.TreeStructure) and base.Last_modified_tree.feature_labels[leaf_node_id_widget.value] != 'leaf_node' or
                             isinstance(base.Last_modified_tree, pd.DataFrame) and base.Last_modified_tree.loc[leaf_node_id_widget.value,'nodes_labels'] != 'leaf_node'):
                             print("The node id must be a leaf node. A test node id is given. Enter a leaf node id")
                         elif(new_class_widget.value not in self.classes_dict['Classes Labels']):
-                            print("The new class does not exist in the dataset. Define the new class using the corresponding tool in the preprocessing stage tab")
+                            print("The new class does not exist in the dataset. Define the new class using the corresponding tool in the preprocessing stage tab.")
                         else:
                             iDT.change_class(leaf_node_id_widget.value, base.Last_modified_tree, new_class_widget.value)
                             iDT.Plot_Tree(base.Last_modified_tree, self.classes_dict, criterion=inter_3.widget.kwargs['criterion'], Best_first_Tree_Builder=True,
@@ -1141,21 +1124,50 @@ class InteractiveDecisionTreesGUI():
                                             plot_width=inter_3.widget.kwargs['plot_width'], plot_height=inter_3.widget.kwargs['plot_height'], 
                                             mrk_size=inter_3.widget.kwargs['mrk_size'], txt_size=inter_3.widget.kwargs['txt_size'], 
                                             opacity_edges=inter_3.widget.kwargs['opacity_edges'], opacity_nodes=inter_3.widget.kwargs['opacity_nodes'], show_figure=True)
-                elif self.counter == 0 and self.counter_prn != 0:
-                    if (isinstance(base_prn.Last_Pruned_tree, iDT.TreeStructure) and base_prn.Last_Pruned_tree.feature_labels[leaf_node_id_widget.value] != 'leaf_node' or
-                        isinstance(base_prn.Last_Pruned_tree, pd.DataFrame) and base_prn.Last_Pruned_tree.loc[leaf_node_id_widget.value,'nodes_labels'] != 'leaf_node'):
-                        print("The node id must be a leaf node. A test node id is given. Enter a leaf node id")
-                    elif(new_class_widget.value not in self.classes_dict['Classes Labels']):  
-                        print("The new class does not exist in the dataset. Define the new class using the corresponding tool in the preprocessing stage tab")
-                    else:
-                        iDT.change_class(leaf_node_id_widget.value, base_prn.Last_Pruned_tree, new_class_widget.value)
-                        iDT.Plot_Tree(base_prn.Last_Pruned_tree, self.classes_dict, criterion=inter_3.widget.kwargs['criterion'], Best_first_Tree_Builder=True, 
-                                        nodes_coloring=inter_3.widget.kwargs['nodes_coloring'], 
-                                        edges_shape=inter_3.widget.kwargs['edges_shape'], 
-                                        User_features_color_groups=None if inter_3.widget.kwargs['nodes_coloring'] != 'Features_color_groups' else self.Features_color_groups,
-                                        plot_width=inter_3.widget.kwargs['plot_width'], plot_height=inter_3.widget.kwargs['plot_height'], 
-                                        mrk_size=inter_3.widget.kwargs['mrk_size'], txt_size=inter_3.widget.kwargs['txt_size'], 
-                                        opacity_edges=inter_3.widget.kwargs['opacity_edges'], opacity_nodes=inter_3.widget.kwargs['opacity_nodes'], show_figure=True)
+                    elif self.counter != 0 and self.counter_prn != 0:
+                        if Last_tree_interaction_widget.value == 'Last pruned':
+                            if (isinstance(base_prn.Last_Pruned_tree, iDT.TreeStructure) and base_prn.Last_Pruned_tree.feature_labels[leaf_node_id_widget.value] != 'leaf_node' or
+                                isinstance(base_prn.Last_Pruned_tree, pd.DataFrame) and base_prn.Last_Pruned_tree.loc[leaf_node_id_widget.value,'nodes_labels'] != 'leaf_node'):
+                                print("The node id must be a leaf node. A test node id is given. Enter a leaf node id")
+                            elif (new_class_widget.value not in self.classes_dict['Classes Labels']):
+                                print("The new class does not exist in the dataset. Define the new class using the corresponding tool in the preprocessing stage tab")
+                            else:
+                                iDT.change_class(leaf_node_id_widget.value, base_prn.Last_Pruned_tree, new_class_widget.value)
+                                iDT.Plot_Tree(base_prn.Last_Pruned_tree, self.classes_dict, criterion=inter_3.widget.kwargs['criterion'], Best_first_Tree_Builder=True,
+                                                nodes_coloring=inter_3.widget.kwargs['nodes_coloring'], edges_shape=inter_3.widget.kwargs['edges_shape'], 
+                                                User_features_color_groups=None if inter_3.widget.kwargs['nodes_coloring'] != 'Features_color_groups' else self.Features_color_groups,
+                                                plot_width=inter_3.widget.kwargs['plot_width'], plot_height=inter_3.widget.kwargs['plot_height'],
+                                                mrk_size=inter_3.widget.kwargs['mrk_size'], txt_size=inter_3.widget.kwargs['txt_size'], 
+                                                opacity_edges=inter_3.widget.kwargs['opacity_edges'], opacity_nodes=inter_3.widget.kwargs['opacity_nodes'], show_figure=True)
+                        elif Last_tree_interaction_widget.value == 'Last modified':
+                            if (isinstance(base.Last_modified_tree, iDT.TreeStructure) and base.Last_modified_tree.feature_labels[leaf_node_id_widget.value] != 'leaf_node' or
+                                isinstance(base.Last_modified_tree, pd.DataFrame) and base.Last_modified_tree.loc[leaf_node_id_widget.value,'nodes_labels'] != 'leaf_node'):
+                                print("The node id must be a leaf node. A test node id is given. Enter a leaf node id")
+                            elif(new_class_widget.value not in self.classes_dict['Classes Labels']):
+                                print("The new class does not exist in the dataset. Define the new class using the corresponding tool in the preprocessing stage tab")
+                            else:
+                                iDT.change_class(leaf_node_id_widget.value, base.Last_modified_tree, new_class_widget.value)
+                                iDT.Plot_Tree(base.Last_modified_tree, self.classes_dict, criterion=inter_3.widget.kwargs['criterion'], Best_first_Tree_Builder=True,
+                                                nodes_coloring=inter_3.widget.kwargs['nodes_coloring'], edges_shape=inter_3.widget.kwargs['edges_shape'], 
+                                                User_features_color_groups=None if inter_3.widget.kwargs['nodes_coloring'] != 'Features_color_groups' else self.Features_color_groups,
+                                                plot_width=inter_3.widget.kwargs['plot_width'], plot_height=inter_3.widget.kwargs['plot_height'], 
+                                                mrk_size=inter_3.widget.kwargs['mrk_size'], txt_size=inter_3.widget.kwargs['txt_size'], 
+                                                opacity_edges=inter_3.widget.kwargs['opacity_edges'], opacity_nodes=inter_3.widget.kwargs['opacity_nodes'], show_figure=True)
+                    elif self.counter == 0 and self.counter_prn != 0:
+                        if (isinstance(base_prn.Last_Pruned_tree, iDT.TreeStructure) and base_prn.Last_Pruned_tree.feature_labels[leaf_node_id_widget.value] != 'leaf_node' or
+                            isinstance(base_prn.Last_Pruned_tree, pd.DataFrame) and base_prn.Last_Pruned_tree.loc[leaf_node_id_widget.value,'nodes_labels'] != 'leaf_node'):
+                            print("The node id must be a leaf node. A test node id is given. Enter a leaf node id")
+                        elif(new_class_widget.value not in self.classes_dict['Classes Labels']):  
+                            print("The new class does not exist in the dataset. Define the new class using the corresponding tool in the preprocessing stage tab")
+                        else:
+                            iDT.change_class(leaf_node_id_widget.value, base_prn.Last_Pruned_tree, new_class_widget.value)
+                            iDT.Plot_Tree(base_prn.Last_Pruned_tree, self.classes_dict, criterion=inter_3.widget.kwargs['criterion'], Best_first_Tree_Builder=True, 
+                                            nodes_coloring=inter_3.widget.kwargs['nodes_coloring'], 
+                                            edges_shape=inter_3.widget.kwargs['edges_shape'], 
+                                            User_features_color_groups=None if inter_3.widget.kwargs['nodes_coloring'] != 'Features_color_groups' else self.Features_color_groups,
+                                            plot_width=inter_3.widget.kwargs['plot_width'], plot_height=inter_3.widget.kwargs['plot_height'], 
+                                            mrk_size=inter_3.widget.kwargs['mrk_size'], txt_size=inter_3.widget.kwargs['txt_size'], 
+                                            opacity_edges=inter_3.widget.kwargs['opacity_edges'], opacity_nodes=inter_3.widget.kwargs['opacity_nodes'], show_figure=True)
 
         #Assign the above function to prune button click
         Change_class_button.on_click(change_leaf_node_class)        
